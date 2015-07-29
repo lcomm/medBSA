@@ -22,8 +22,8 @@ logLikBin = function(v, par){
         p = fam[[v]][["linkinv"]](Xmats[[v]] %*% par)
         
         #Log-likelihood of bernoulli
-        ll = sum(outcome*log(p) + (1-outcome)*log(1-p))
-        
+        ll = sum(dbinom(x = outcome, prob = p, size = 1, log = TRUE))
+    
         #Return
         return(ll)
         
