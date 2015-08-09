@@ -13,7 +13,7 @@
 #' 
 genVar <- function(fam, Xmat, par){
     #Verify conformability for matrix multiplication
-    if (ncol(Xmat) != length(par)) {
+    if (detectFamilyType(fam) == "glm" & ncol(Xmat) != length(par)) {
         stop("GENVAR: design matrix and parameter vector nonconformable")
     }
     

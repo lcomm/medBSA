@@ -4,10 +4,13 @@
 \alias{makeVar}
 \title{Make a GLM-type variable based on the existing list values}
 \usage{
-makeVar(v)
+makeVar(v, dimVar = NULL)
 }
 \arguments{
 \item{v}{The string name of the variable to be generated}
+
+\item{dimVar}{Only needed for categorical variable generation; number of unique
+values the variable can take on}
 }
 \description{
 This wrapper for genVar() and assumes there are existing lists fam, Xmats, and

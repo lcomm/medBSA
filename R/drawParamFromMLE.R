@@ -34,24 +34,32 @@ drawParamFromMLE <- function(v){
     outcome = get(v)
     while (is.character(outcome)) { outcome = get(outcome) }
     
-    #Fit frequentist GLM
-    MLfit = suppressWarnings(glm(outcome ~ as.matrix(Xmats[[v]]) - 1,
-                                 family = fam[[v]],
-                                 start = params[[v]]))
-    
-    #Report back if having convergence or multicollinearity problems
-    if (MLfit[["converged"]] == FALSE | (length(coef(MLfit)) != length(params[[v]]))) {
-        #Let us know it was a problem
-        print("Convergence issues for MLE!")
-        #Use priors
-        props[[v]][["mean"]] <<- priors[[v]][["mean"]]
-        props[[v]][["Sigma"]] <<- priors[[v]][["Sigma"]]
-    } else if (MLfit[["converged"]] == TRUE) {
+    #Fit frequentist GLM unless VGLM is specified
+    if (detectFamilyType(fam[[v]]) == "glm"){
+        MLfit = suppressWarnings(glm(outcome ~ as.matrix(Xmats[[v]]) - 1,
+                                     family = fam[[v]],
+                                     start = params[[v]]))
+        
+        #Report back if having convergence or multicollinearity problems
+        if (MLfit[["converged"]] == FALSE | (length(coef(MLfit)) != length(params[[v]]))) {
+            #Let us know it was a problem
+            print("Convergence issues for MLE!")
+            #Use priors
+            props[[v]][["mean"]] <<- priors[[v]][["mean"]]
+            props[[v]][["Sigma"]] <<- priors[[v]][["Sigma"]]
+        } else if (MLfit[["converged"]] == TRUE) {
+            #Save proposal information
+            props[[v]][["mean"]] <<- coef(MLfit)
+            props[[v]][["Sigma"]] <<- vcov(MLfit)
+        }
+    } else if (detectFamilyType(fam[[v]]) == "multinom"){
+        #Fit multinomial model
+        MLfit = vglm(outcome ~ as.matrix(Xmats[[v]]) - 1,
+                     family = fam[[v]])
         #Save proposal information
         props[[v]][["mean"]] <<- coef(MLfit)
         props[[v]][["Sigma"]] <<- vcov(MLfit)
     }
-    
     #Draw parameter vector
     return(drawParam(v))
     
