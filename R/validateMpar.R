@@ -9,6 +9,7 @@
 #' 
 #' @param par Vector of candidate M.par
 #' @return FALSE if M is log-link and has fitted values above 1; TRUE otherwise
+#' 
 #' @examples
 #' ##Make environment variables
 #' fam = list(M = binomial(link="log"))
@@ -32,7 +33,7 @@
 validateMpar <- function(par){
     
     #Only need to validate for log link
-    if (fam[["M"]][["link"]] != "log"){
+    if (detectFamilyType(fam[["M"]]) == "multinom" || fam[["M"]][["link"]] != "log"){
         return(TRUE)
     } else {
         #Otherwise, check no fitted probabilities bigger than 1
