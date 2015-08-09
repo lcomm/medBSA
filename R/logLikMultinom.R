@@ -6,8 +6,10 @@
 #' 
 #' @param v String containing variable name
 #' @param par Parameter vector of regression coefficients 
+#' @param Xmat Optional design matrix for computing log-likelihood; if none is
+#' specified, Xmats[[v]] is used
 #' 
-logLikMultinom <- function(v, par){
+logLikMultinom <- function(v, par, Xmat = NULL){
     
     #Get outcome variable
     outcome = get("v")
@@ -26,16 +28,19 @@ logLikMultinom <- function(v, par){
         outcome <- cbind(1-rowSums(outcome), outcome)
     }
     
+    #Extract design matrix
+    if (is.null(Xmat)) { Xmat = Xmats[[v]] }
+    
     #Figure out if par is a vector or a matrix
     #If a vector, need to reshape into a form suitable for applying
     #inverse multilogit function
     if (is.vector(par)){
-        nParam = ncol(Xmats[[v]])
+        nParam = ncol(Xmat)
         par = matrix(par, nrow = length(par)/nParam, ncol = nParam, byrow = TRUE)
     }
     
     #Get probabilities for each category
-    probs = multilogit(Xmats[[v]] %*% par, inverse=TRUE)
+    probs = multilogit(Xmat %*% par, inverse=TRUE)
 
     #Calculate log-likelihood from all n subjects
     #Extract only the realized probabilities, then sum the logs of those 

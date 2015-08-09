@@ -4,12 +4,15 @@
 \alias{logLikBin}
 \title{Obtain log-likelihood of binary variable}
 \usage{
-logLikBin(v, par)
+logLikBin(v, par, Xmat = NULL)
 }
 \arguments{
 \item{v}{String containing variable name}
 
 \item{par}{Parameter vector of regression coefficients}
+
+\item{Xmat}{Optional design matrix for computing log-likelihood; if none is
+specified, Xmats[[v]] is used}
 }
 \description{
 This function returns the log-likelihood of binary data.  Relies on the

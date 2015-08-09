@@ -12,7 +12,8 @@
 #' @param log Should the log-density be returned? Defaults to FALSE
 #' @return Vector of likelihood contributions for v
 #' 
-Like = function(v, Xmat = NULL, par = NULL, log=FALSE){
+Like = function(v, Xmat = NULL, par = NULL, log = FALSE){
+    
     #Extract outcome
     outcome = get(v)
     while (is.character(outcome)) { outcome = get(outcome) }
@@ -23,22 +24,20 @@ Like = function(v, Xmat = NULL, par = NULL, log=FALSE){
     #Default to current value of parameter unless special one is passed
     if (is.null(par)) { par = params[[v]] }
     
-    #Calculate eta, the linear predictor
-    linpred = Xmat %*% par
+    #Calculate log-likelihood based on data type of v
+    if (isBinary(fam[[v]])){
+        ll = logLikBin(v, par, Xmat)
+    } else if (isMultinomialLogit(fam[[v]])){
+        ll = logLikMultinom(v, par, Xmat)
+    } else { stop("Only binary and categorical data types supported at this time") }
+        
+    #Return likelihood in requested form
+    if (log == TRUE){
+        return(ll)
+    } else {
+        return(exp(ll))
+    }
     
-    #Calculate likelihood or log-likelihood
-    if (fam[[v]][["family"]] == "binomial"){
-        if (log == FALSE){
-            lik = ( fam[[v]][["linkinv"]](linpred) )^outcome + 
-                (1 - fam[[v]][["linkinv"]](linpred) )^(1 - outcome)
-        } else if (log == TRUE){
-            lik = outcome*log( fam[[v]][["linkinv"]](linpred) ) +
-                (1 - outcome)*log( 1 - fam[[v]][["linkinv"]](linpred) )
-        }
-    } else { stop("LIKE: family not supported") }
-    
-    #Return
-    return(lik)
 }
 
 
