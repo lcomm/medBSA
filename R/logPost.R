@@ -12,10 +12,12 @@ logPost <- function(v, par) {
         #Binary
         logPostBin(v, par)
         
-    } else if (isMultinomial(fam[[v]])) {
+    } else if (isMultinomialLogit(fam[[v]])) {
         #Categorical
         logPostMultinom(v, par)
         
     } else { stop("Likelihood form not recognized by logPost function!") }
         
 }
+
+

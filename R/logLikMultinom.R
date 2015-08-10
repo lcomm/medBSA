@@ -1,4 +1,4 @@
-#' Make a dummy variable matrix based on 
+#' Calculate log-likelihood of multinomial random variable 
 #' 
 #' This function returns the log-likelihood of multinomial data.  Relies on the 
 #' existence of Xmats[[v]] and fam[[v]] containing the design matrix and link 
@@ -35,10 +35,15 @@ logLikMultinom <- function(v, par, Xmat = NULL){
     #If a vector, need to reshape into a form suitable for applying
     #inverse multilogit function
     if (is.vector(par)){
+        
+        #Number of parameters in each logit model
         nParam = ncol(Xmat)
-        par = matrix(par, nrow = length(par)/nParam, ncol = nParam, byrow = TRUE)
+        
+        #Reshape to parameter matrix
+        par = matrix(par, ncol = length(par)/nParam, nrow = nParam, byrow = TRUE)
+        
     }
-    
+
     #Get probabilities for each category
     probs = multilogit(Xmat %*% par, inverse=TRUE)
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/logLikMultinom.R
 \name{logLikMultinom}
 \alias{logLikMultinom}
-\title{Make a dummy variable matrix based on}
+\title{Calculate log-likelihood of multinomial random variable}
 \usage{
 logLikMultinom(v, par, Xmat = NULL)
 }
