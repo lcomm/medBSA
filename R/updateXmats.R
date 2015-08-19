@@ -7,6 +7,10 @@
 #' @seealso get.pU1
 #' 
 updateXmats = function(){
+    #Get Xmats
+    
+    #Get which environment Xmats is stored in, so we know where to update
+    
     #Update U, if necessary, in every Xmat matrix with U as a column
     for (i in 1:length(Xmats)){
         if ("U" %in% colnames(Xmats[[i]])){
