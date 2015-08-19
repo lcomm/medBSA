@@ -11,11 +11,11 @@
 #' 
 #' @return A matrix of indicator values for each of the levels
 #' 
-makeMultinomialDummy <- function(vec, ref=1, dropRef = FALSE, prefix=NULL){
+makeMultinomialDummy <- function(vec, ref = 1, dropRef = FALSE, prefix = NULL){
     
     #Get levels 
     nLevs = length(unique(vec))
-    
+        
     #Turn into design matrix
     desMat = t(sapply(as.factor(vec), 
                       FUN=function(x){ 
@@ -24,16 +24,27 @@ makeMultinomialDummy <- function(vec, ref=1, dropRef = FALSE, prefix=NULL){
                           return(ans) 
                       }))
     
+    #Ensure it's a matrix not just a vector
+    if (nLevs == 2){
+        desMat = as.matrix(desMat, ncol = 2, nrow = length(vec))
+    }
+    
     #Apply column labels
     if (!is.null(prefix)) { 
-        colnames(desMat) = paste0(prefix, 0:(nLevs-1))
+        if (nLevs > 2){
+            colnames(desMat) = paste0(prefix, 0:(nLevs-1))
+        } else {
+            colnames(desMat) = c("Ref", prefix)    
+        }
     } else {
         colnames(desMat) = 0:(nLevs-1)
     }
     
     #Return requested value
     if (dropRef == TRUE) {
-        return(desMat[,-ref])
+        desMatSmall = as.matrix(desMat[,-ref])
+        colnames(desMatSmall) = colnames(desMat)[-ref]
+        return(desMatSmall)
     } else {
         return(desMat)
     }

@@ -40,7 +40,7 @@ validateYpar <- function(par){
         #This check only works perfectly for binary variables right now!
         #May not be conservative enough if maximum values of variables
         #are above 1
-        if (exists("Xmats$Y")) {
+        if (exists("Xmats")) {
             return( max(Xmats[["Y"]] %*% par) < 0 )    
         } else {
             return( sum(abs(par[-1])) < abs(par[1]) )
