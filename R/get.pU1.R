@@ -53,11 +53,11 @@ get.pU1 = function(){
         piU = fam[["U"]][["linkinv"]](Xmats[["U"]] %*% U.par)
         
         #Un-normalized P(U_i = 1 | everything)
-        logPieceA = Like("Y", Xmat = XmatYU1, log = TRUE) + 
+        logPieceA = Like("Y", Xmat = XmatYU1, log = TRUE, summation = FALSE) + 
                     log(piU)
         
         #Un-normalized P(U_i = 0 | everything)
-        logPieceB = Like("Y", Xmat = XmatYU0, log = TRUE) + 
+        logPieceB = Like("Y", Xmat = XmatYU0, log = TRUE, summation = FALSE) + 
                     log(1-piU)
         
         #Normalized vector of P(U_i = 1 | everything)
