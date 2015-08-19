@@ -14,21 +14,21 @@
 makeMultinomialDummy <- function(vec, ref=1, dropRef = FALSE, prefix=NULL){
     
     #Get levels 
-    levs = unique(vec)
+    nLevs = length(unique(vec))
     
     #Turn into design matrix
     desMat = t(sapply(as.factor(vec), 
                       FUN=function(x){ 
-                          ans = rep(0, length(levs))
+                          ans = rep(0, nLevs)
                           ans[x] = 1
                           return(ans) 
                       }))
     
     #Apply column labels
     if (!is.null(prefix)) { 
-        colnames(desMat) = paste0(prefix, levs)
+        colnames(desMat) = paste0(prefix, 0:(nLevs-1))
     } else {
-        colnames(desMat) = levs
+        colnames(desMat) = 0:(nLevs-1)
     }
     
     #Return requested value

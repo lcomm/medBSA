@@ -4,10 +4,13 @@
 \alias{drawParamFromPrior}
 \title{Draw a parameter set from the (MVN) prior distribution}
 \usage{
-drawParamFromPrior(v)
+drawParamFromPrior(v, priorlist = NULL)
 }
 \arguments{
 \item{v}{The name of the variable, as a string}
+
+\item{priorlist}{(Optional) List containing priors; if not specified, then the
+"priors" list must already exist in the surrounding environment}
 }
 \value{
 A parameter vector drawn from the prior distribution
