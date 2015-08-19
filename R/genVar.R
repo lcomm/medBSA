@@ -15,6 +15,9 @@ genVar <- function(fam, Xmat, par){
     #Verify conformability for matrix multiplication
     if (detectFamilyType(fam) == "glm" & ncol(Xmat) != length(par)) {
         stop("GENVAR: design matrix and parameter vector nonconformable")
+    } else {
+        #Change parameter to vector to be conformable no matter what
+        par = as.numeric(par)
     }
     
     #Make variable based on what is requested
