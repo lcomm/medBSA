@@ -8,8 +8,10 @@
 #' @param par Parameter vector of regression coefficients 
 #' @param Xmat Optional design matrix for computing log-likelihood; if none is
 #' specified, Xmats[[v]] is used
+#' @param summation Whether the individual likelihood contributions should be summed;
+#' defaults to TRUE
 #' 
-logLikBin = function(v, par, Xmat = NULL){
+logLikBin = function(v, par, Xmat = NULL, summation = TRUE){
     
     #Get outcome variable
     outcome = get("v")
@@ -26,9 +28,12 @@ logLikBin = function(v, par, Xmat = NULL){
         #Calculate p(v = 1 | X, par) based on the link function and the coefficients' value
         p = fam[[v]][["linkinv"]](Xmat %*% par)
         
-        #Log-likelihood of bernoulli
-        ll = sum(dbinom(x = outcome, prob = p, size = 1, log = TRUE))
-    
+        #Log-likelihood of bernoulli, individual contributions
+        ll = dbinom(x = outcome, prob = p, size = 1, log = TRUE)
+        
+        #Sum if requested
+        if (summation == TRUE) { ll = sum(ll) }
+        
         #Return
         return(ll)
         

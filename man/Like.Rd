@@ -4,7 +4,7 @@
 \alias{Like}
 \title{Calculate the likelihood of a variable given its design matrix and parameter}
 \usage{
-Like(v, Xmat = NULL, par = NULL, log = FALSE)
+Like(v, Xmat = NULL, par = NULL, log = FALSE, summation = TRUE)
 }
 \arguments{
 \item{v}{String containing the variable name}
@@ -16,6 +16,9 @@ part of v}
 part of v}
 
 \item{log}{Should the log-density be returned? Defaults to FALSE}
+
+\item{summation}{Should the log-likelihoods be summed across the subjects (or
+likelihoods multiplied out)?  Defaults to TRUE}
 }
 \value{
 Vector of likelihood contributions for v

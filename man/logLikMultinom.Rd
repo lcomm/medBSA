@@ -4,7 +4,7 @@
 \alias{logLikMultinom}
 \title{Calculate log-likelihood of multinomial random variable}
 \usage{
-logLikMultinom(v, par, Xmat = NULL)
+logLikMultinom(v, par, Xmat = NULL, summation = TRUE)
 }
 \arguments{
 \item{v}{String containing variable name}
@@ -13,6 +13,9 @@ logLikMultinom(v, par, Xmat = NULL)
 
 \item{Xmat}{Optional design matrix for computing log-likelihood; if none is
 specified, Xmats[[v]] is used}
+
+\item{summation}{Whether the individual likelihood contributions should be summed;
+defaults to TRUE}
 }
 \description{
 This function returns the log-likelihood of multinomial data.  Relies on the

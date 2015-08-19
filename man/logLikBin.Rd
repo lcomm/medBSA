@@ -4,7 +4,7 @@
 \alias{logLikBin}
 \title{Obtain log-likelihood of binary variable}
 \usage{
-logLikBin(v, par, Xmat = NULL)
+logLikBin(v, par, Xmat = NULL, summation = TRUE)
 }
 \arguments{
 \item{v}{String containing variable name}
@@ -13,6 +13,9 @@ logLikBin(v, par, Xmat = NULL)
 
 \item{Xmat}{Optional design matrix for computing log-likelihood; if none is
 specified, Xmats[[v]] is used}
+
+\item{summation}{Whether the individual likelihood contributions should be summed;
+defaults to TRUE}
 }
 \description{
 This function returns the log-likelihood of binary data.  Relies on the

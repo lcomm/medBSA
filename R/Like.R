@@ -10,9 +10,11 @@
 #' @param par Optional parameter to specify parameter vector used in linear predictor
 #' part of v
 #' @param log Should the log-density be returned? Defaults to FALSE
+#' @param summation Should the log-likelihoods be summed across the subjects (or 
+#' likelihoods multiplied out)?  Defaults to TRUE
 #' @return Vector of likelihood contributions for v
 #' 
-Like = function(v, Xmat = NULL, par = NULL, log = FALSE){
+Like = function(v, Xmat = NULL, par = NULL, log = FALSE, summation = TRUE){
     
     #Extract outcome
     outcome = get(v)
@@ -26,9 +28,9 @@ Like = function(v, Xmat = NULL, par = NULL, log = FALSE){
     
     #Calculate log-likelihood based on data type of v
     if (isBinary(fam[[v]])){
-        ll = logLikBin(v, par, Xmat)
+        ll = logLikBin(v, par, Xmat, summation)
     } else if (isMultinomialLogit(fam[[v]])){
-        ll = logLikMultinom(v, par, Xmat)
+        ll = logLikMultinom(v, par, Xmat, summation)
     } else { stop("Only binary and categorical data types supported at this time") }
         
     #Return likelihood in requested form

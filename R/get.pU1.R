@@ -27,17 +27,27 @@ get.pU1 = function(){
         piU = fam[["U"]][["linkinv"]](Xmats[["U"]] %*% U.par)
         
         #Un-normalized P(U_i = 1 | everything)
-        logPieceA = Like("Y", Xmat = XmatYU1, log = TRUE) +
-                    Like("M", Xmat = XmatMU1, log = TRUE) + 
+        logPieceA = Like("Y", Xmat = XmatYU1, par = Y.par, log = TRUE, summation = FALSE) +
+                    Like("M", Xmat = XmatMU1, par = M.par, log = TRUE, summation = FALSE) + 
                     log(piU)
         
         #Un-normalized P(U_i = 0 | everything)
-        logPieceB = Like("Y", Xmat = XmatYU0, log = TRUE) +
-                    Like("M", Xmat = XmatMU0, log = TRUE) + 
-                    log(1-piU)
+        logPieceB = Like("Y", Xmat = XmatYU0, par = Y.par, log = TRUE, summation = FALSE) +
+                    Like("M", Xmat = XmatMU0, par = M.par, log = TRUE, summation = FALSE) + 
+                    log(1 - piU)
         
         #Normalized vector of P(U_i = 1 | everything)
         pU1 = 1/(1 + exp(logPieceB - logPieceA))
+        
+        #Approach 2
+        #Commenting out for now, but could be useful for overflow/underflow?
+#         Ydiff =  Like("Y", Xmat = XmatYU0, par = Y.par, log = TRUE) -
+#                  Like("Y", Xmat = XmatYU1, par = Y.par, log = TRUE)
+#         Mdiff =  Like("M", Xmat = XmatMU0, par = M.par, log = TRUE) -
+#                  Like("M", Xmat = XmatMU1, par = M.par, log = TRUE)
+#         piUdiff = log(1-piU) - log(piU) 
+#         1/(1 + exp(Ydiff + Mdiff + piUdiff))
+        
     } else {        
         #Calculate piU, the P(U=1) from U regression part
         piU = fam[["U"]][["linkinv"]](Xmats[["U"]] %*% U.par)

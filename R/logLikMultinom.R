@@ -8,8 +8,10 @@
 #' @param par Parameter vector of regression coefficients 
 #' @param Xmat Optional design matrix for computing log-likelihood; if none is
 #' specified, Xmats[[v]] is used
+#' @param summation Whether the individual likelihood contributions should be summed;
+#' defaults to TRUE
 #' 
-logLikMultinom <- function(v, par, Xmat = NULL){
+logLikMultinom <- function(v, par, Xmat = NULL, summation = TRUE){
     
     #Get outcome variable
     outcome = get("v")
@@ -47,9 +49,15 @@ logLikMultinom <- function(v, par, Xmat = NULL){
     #Get probabilities for each category
     probs = multilogit(Xmat %*% par, inverse=TRUE)
 
-    #Calculate log-likelihood from all n subjects
-    #Extract only the realized probabilities, then sum the logs of those 
-    ll = sum(log(probs[as.logical(outcome)]))
+    #Get log-likelihood or summed log-likelihood, depending
+    if (summation == TRUE){
+        #Calculate log-likelihood from all n subjects
+        #Extract only the realized probabilities, then sum the logs of those 
+        ll = sum(log(probs[as.logical(outcome)]))
+    } else {
+        #Calculate log-likelihood for each subject individually
+        ll = rowSums(log(probs[as.logical(outcome)]))
+    }
     
     #Return
     return(ll)
