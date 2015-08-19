@@ -25,27 +25,31 @@ get.pU1 = function(){
     if (case == "mediator"){
         #Calculate piU, the P(U=1) from U regression part
         piU = fam[["U"]][["linkinv"]](Xmats[["U"]] %*% U.par)
+        
         #Un-normalized P(U_i = 1 | everything)
-        logLikBin(v="Y", par = Y.par, Xmat = Xmats[["Y"]])
-        sum(dbinom(x = Y,prob = expit(Xmats[["Y"]]%*%Y.par), size=1, log=TRUE))
         logPieceA = Like("Y", Xmat = XmatYU1, log = TRUE) +
                     Like("M", Xmat = XmatMU1, log = TRUE) + 
                     log(piU)
+        
         #Un-normalized P(U_i = 0 | everything)
         logPieceB = Like("Y", Xmat = XmatYU0, log = TRUE) +
                     Like("M", Xmat = XmatMU0, log = TRUE) + 
                     log(1-piU)
+        
         #Normalized vector of P(U_i = 1 | everything)
         pU1 = 1/(1 + exp(logPieceB - logPieceA))
-    } else {
+    } else {        
         #Calculate piU, the P(U=1) from U regression part
         piU = fam[["U"]][["linkinv"]](Xmats[["U"]] %*% U.par)
+        
         #Un-normalized P(U_i = 1 | everything)
         logPieceA = Like("Y", Xmat = XmatYU1, log = TRUE) + 
                     log(piU)
+        
         #Un-normalized P(U_i = 0 | everything)
         logPieceB = Like("Y", Xmat = XmatYU0, log = TRUE) + 
                     log(1-piU)
+        
         #Normalized vector of P(U_i = 1 | everything)
         pU1 = 1/(1 + exp(logPieceB - logPieceA))
     }
