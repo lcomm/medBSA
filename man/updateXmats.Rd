@@ -2,7 +2,7 @@
 % Please edit documentation in R/updateXmats.R
 \name{updateXmats}
 \alias{updateXmats}
-\title{Update design matrices after with new value of U}
+\title{Update design matrices in BSAe environment with new value of U}
 \usage{
 updateXmats()
 }

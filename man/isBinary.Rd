@@ -17,9 +17,9 @@ Returns TRUE if a the family is binomial and FALSE otherwise
 }
 \examples{
 ##Should be TRUE
-isBinary(binomial(link="logit"))
+isBinary(binomial(link = "logit"))
 
 ##Should be FALSE
-isBinary(multinomial(parallel=FALSE))
+isBinary(multinomial(parallel = FALSE))
 }
 

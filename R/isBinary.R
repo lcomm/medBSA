@@ -7,10 +7,10 @@
 #' 
 #' @examples
 #' ##Should be TRUE
-#' isBinary(binomial(link="logit"))
+#' isBinary(binomial(link = "logit"))
 #' 
 #' ##Should be FALSE
-#' isBinary(multinomial(parallel=FALSE))
+#' isBinary(multinomial(parallel = FALSE))
 #' 
 isBinary <- function(family){
     if (detectFamilyType(family) == "glm" && family[["family"]] == "binomial"){

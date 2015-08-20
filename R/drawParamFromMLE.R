@@ -30,6 +30,8 @@
 #' 
 drawParamFromMLE <- function(v){
     
+    #THIS IS NEW
+    
     #Extract variable
     outcome = get(v)
     while (is.character(outcome)) { outcome = get(outcome) }
@@ -64,4 +66,3 @@ drawParamFromMLE <- function(v){
     return(drawParam(v))
     
 }
-
