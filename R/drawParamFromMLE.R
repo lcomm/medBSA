@@ -60,6 +60,10 @@ drawParamFromMLE <- function(v){
         props[[v]][["mean"]] <<- coef(MLfit)
         props[[v]][["Sigma"]] <<- vcov(MLfit)
     }
+    
+    #Inflate proposal distribution
+    inflateProps()
+    
     #Draw parameter vector
     return(drawParam(v))
     
