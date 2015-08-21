@@ -27,7 +27,7 @@
 
 #' 
 insertZsIntoVcov <- function(mat, diagElem, p = length(diagElem)){
-#     mat = myMat
+
     #Parameter checking
     if (!is.matrix(mat) || nrow(mat) != ncol(mat)){
         stop("Need square matrix as input!")
