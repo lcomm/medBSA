@@ -71,8 +71,8 @@ insertZsIntoVcov <- function(mat, diagElem, p = length(diagElem)){
     
     #Name columns
     colnames(newMat)[c(1:nColBefore, (nColBefore + 1 + p):dimNewMat)] <- colnames(mat)
-    newZnames <- paste0("Z", (nOldZ + 1):(nOldZ + 1 + p))
-    colnames(newMat)[(nColBefore+1):(nColBefore + 1 + p)] <- newZnames
+    newZnames <- paste0("Z", (nOldZ + 1):(nOldZ + p))
+    colnames(newMat)[(nColBefore+1):(nColBefore + p)] <- newZnames
     
     #Name rows as well if the old matrix had row names and they were same as colnames
     if (!is.null(rownames(mat)) && identical(rownames(mat), colnames(mat))) { 
