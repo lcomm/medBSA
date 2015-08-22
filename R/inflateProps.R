@@ -17,7 +17,7 @@ inflateProps <- function(){
     }
     
     #Do M as well if mediator case
-    if (case == "mediation" && exists("tauPropM")){
+    if (case == "mediator" && exists("tauPropM")){
         props[["M"]][["Sigma"]] <<- props[["M"]][["Sigma"]] * tauPropM
     }
     
