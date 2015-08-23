@@ -4,7 +4,11 @@
 \alias{calculateARD}
 \title{Calculate average residual disparity}
 \usage{
-calculateARD()
+calculateARD(Yval = 1)
+}
+\arguments{
+\item{Yval}{The value of Y for which to evaluate the risk ratio.
+Defaults to 1, so returned risk ratio will be for P(Y=1)}
 }
 \value{
 ARD The average residual disparity after intervening on M

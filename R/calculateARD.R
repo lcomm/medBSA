@@ -8,9 +8,12 @@
 #' intervene on).  Function requires A, Y.par, U.par, M.par, fam, and Xmats to 
 #' be in the environment
 #' 
+#' @param Yval The value of Y for which to evaluate the risk ratio.  
+#' Defaults to 1, so returned risk ratio will be for P(Y=1)
+#' 
 #' @return ARD The average residual disparity after intervening on M
 #' 
-calculateARD <- function(){
+calculateARD <- function(Yval = 1){
     #Only works for binary M, Y, and U right now
     if (!isBinary(fam[["Y"]]) || !isBinary(fam[["M"]]) || !isBinary(fam[["U"]])){
         stop("Only works for binary M, Y, and U right now")
@@ -41,7 +44,13 @@ calculateARD <- function(){
     piMA0 <- getLinkinv(fam[["M"]])(XmatMifA0 %*% M.par)
     
     #Denominator: sum over M strata weighted by P(M=m | A=0, Z=z, U=u)
-    denom <- piYA0M0 * (1-piMA0) + piYA0M1 * (piMA0)
+    if (Yval == 1) {
+        #Just usual formula
+        denom <- piYA0M0 * (1-piMA0) + piYA0M1 * (piMA0)
+    } else if (Yval == 0){
+        #Have to flip because we actually wanted P(Y=0)
+        denom <- (1-piYA0M0) * (1-piMA0) + (1-piYA0M1) * (piMA0)
+    }
     
     
     ###Calculate numerator, E[Y_Hx(0) | A=1, Z=z, U=u]
@@ -59,11 +68,19 @@ calculateARD <- function(){
     piYA1M1 <- getLinkinv(fam[["Y"]])(XmatYifA1M1 %*% Y.par)
     
     #Numerator: sum over M strata weighted by P(M=m | A=0, Z=z, U=u)
-    numer <- piYA1M0 * (1-piMA0) + piYA1M1 * (piMA0)
+    if (Yval == 1) {
+        #Just usual formula
+        numer <- piYA1M0 * (1-piMA0) + piYA1M1 * (piMA0)
+    } else if (Yval == 0){
+        #Have to flip because we actually wanted P(Y=0)
+        numer <- (1-piYA1M0) * (1-piMA0) + (1-piYA1M1) * (piMA0)
+    }
+    
 
     ##Put it all together
     #Individual-level residual disparity
     disp <- numer/denom
+    
 
     #Average residual disparity
     ARD <- mean(disp, na.rm = TRUE)
