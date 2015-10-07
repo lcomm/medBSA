@@ -29,7 +29,10 @@ fitFrequentistModel <- function(v){
     #Otherwise, fit GLM
     if (class(fam[[v]]) == "vglmff" && attr(fam[[v]], "vfamily") == "multinomial"){
         #Fit multinomial logit model
-        fit <- vglm(outcome ~ -1 + Xmat, family = fam[[v]])
+        if (sum(outcome) != nrow(outcome)) {
+            outcome <- cbind(1 - rowSums(outcome), outcome)
+        }
+        fit <- vglm(outcome ~ -1 + as.matrix(Xmats[[v]]), family = multinomial(parallel = FALSE, ref = 1))
     } else {
         #Fit
         fit <- glm(outcome ~ -1 + as.matrix(Xmats[[v]]), family = fam[[v]], start = params[[v]])

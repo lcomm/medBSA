@@ -42,20 +42,29 @@ drawParamFromMLE <- function(v){
         
         #Report back if having convergence or multicollinearity problems
         if (MLfit[["converged"]] == FALSE | (length(coef(MLfit)) != length(params[[v]]))) {
+            
             #Let us know it was a problem
             print("Convergence issues for MLE!")
+            
             #Use priors
             props[[v]][["mean"]] <<- priors[[v]][["mean"]]
             props[[v]][["Sigma"]] <<- priors[[v]][["Sigma"]]
+            
         } else if (MLfit[["converged"]] == TRUE) {
+        
             #Save proposal information
             props[[v]][["mean"]] <<- coef(MLfit)
             props[[v]][["Sigma"]] <<- vcov(MLfit)
+            
         }
     } else if (detectFamilyType(fam[[v]]) == "multinom"){
+        
         #Fit multinomial model
-        MLfit = vglm(outcome ~ as.matrix(Xmats[[v]]) - 1,
-                     family = fam[[v]])
+        if (!(sum(outcome) == nrow(outcome))) {
+            outcome <- cbind(1 - rowSums(outcome), outcome)
+        }
+        MLfit <- vglm(outcome ~ -1 + as.matrix(Xmats[[v]]), family = multinomial(parallel = FALSE, ref = 1))
+        
         #Save proposal information
         props[[v]][["mean"]] <<- coef(MLfit)
         props[[v]][["Sigma"]] <<- vcov(MLfit)
