@@ -5,13 +5,13 @@
 #' functions for v.
 #' 
 #' @param v String containing variable name
-#' @param par Parameter vector of regression coefficients 
+#' @param par.v Parameter vector of regression coefficients 
 #' @param Xmat Optional design matrix for computing log-likelihood; if none is
 #' specified, Xmats[[v]] is used
 #' @param summation Whether the individual likelihood contributions should be summed;
 #' defaults to TRUE
 #' 
-logLikMultinom <- function(v, par, Xmat = NULL, summation = TRUE){
+logLikMultinom <- function(v, par.v, Xmat = NULL, summation = TRUE){
     
     #Get outcome variable
     outcome = get("v")
@@ -26,29 +26,29 @@ logLikMultinom <- function(v, par, Xmat = NULL, summation = TRUE){
     
     #If the rows do not all sum to 1, add the 1st column in order as indicator
     #of the reference level
-    if (!identical(rowSums(outcome), rep(1, nrow(outcome)))) {
+    if (sum(outcome) != nrow(outcome)) {
         outcome <- cbind(1-rowSums(outcome), outcome)
     }
-    
+
     #Extract design matrix
     if (is.null(Xmat)) { Xmat = Xmats[[v]] }
     
-    #Figure out if par is a vector or a matrix
+    #Figure out if par.v is a vector or a matrix
     #If a vector, need to reshape into a form suitable for applying
     #inverse multilogit function
-    if (is.vector(par)){
+    if (is.vector(par.v)){
         
         #Number of parameters in each logit model
         nParam = ncol(Xmat)
         
         #Reshape to parameter matrix
-        par = matrix(par, ncol = length(par)/nParam, nrow = nParam, byrow = TRUE)
+        par.v = matrix(par.v, nrow = nParam, byrow = TRUE)
         
     }
 
     #Get probabilities for each category
-    probs = multilogit(Xmat %*% par, inverse=TRUE)
-
+    probs = multilogit(Xmat %*% par.v, inverse=TRUE)
+    
     #Get log-likelihood or summed log-likelihood, depending
     if (summation == TRUE){
         #Calculate log-likelihood from all n subjects
@@ -56,7 +56,7 @@ logLikMultinom <- function(v, par, Xmat = NULL, summation = TRUE){
         ll = sum(log(probs[as.logical(outcome)]))
     } else {
         #Calculate log-likelihood for each subject individually
-        ll = rowSums(log(probs[as.logical(outcome)]))
+        ll = log(probs[as.logical(outcome)])
     }
     
     #Return
