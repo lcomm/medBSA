@@ -85,7 +85,7 @@ calculateARD <- function(Yval = 1){
         
         #Reshape M.par into a form suitable for applying inverse multilogit function
         #Copy over
-        par <- M.par
+        par.v <- M.par
         
         #### Y regression
         #Extract columns having to do with interaction variable
@@ -105,14 +105,17 @@ calculateARD <- function(Yval = 1){
         #Extract Y design matrix only for people with A = 1
         XmatYA0 <- Xmats[["Y"]][whichA1, ]
         
-        #Change A column of M design matrix to be 0
+        #Change all A columns of M design matrix to be 0
         col_A_XmatY <- grep("A", colnames(XmatYA0))
         XmatYA0[, col_A_XmatY] <- 0
+        
+        #Only main effect of A
+        col_A <- which(colnames(XmatYA0) == "A")
         
         
         #### M regression
         #Get M regression parameters into matrix form for multilogit inversion
-        par <- matrix(M.par, nrow=ncol(M) - 1)
+        par.v <- matrix(par.v, nrow = ncol(Xmats[["M"]]), byrow = TRUE)
         
         #Extract M design matrix only for people with A = 1
         XmatMA0 <- Xmats[["M"]][whichA1, ]
@@ -122,10 +125,7 @@ calculateARD <- function(Yval = 1){
         XmatMA0[, col_A_XmatM] <- 0
         
         #Calculate probabilities of each (non-zero) M value had A been 0
-        probs <- matrix(multilogit(multilogit(XmatMA0 %*% par, inverse = TRUE)), ncol=3, byrow=TRUE)
-        
-        #Get probability for M being 0
-        probs0 <- 1 - rowSums(probs)
+        probs <- multilogit(XmatMA0 %*% par.v, inverse=TRUE)
         
         #Evaluate counterfactuals
         for (m in 0:length(col_M)){
@@ -140,22 +140,22 @@ calculateARD <- function(Yval = 1){
                 
                 #Linear predictor for A = 1 includes A parameter(s)
                 #Not including m terms since m = 0 here
-                etaA1 <- Ymat_o %*% Ypar_o + Y.par[col_A_XmatY]
+                etaA1 <- Ymat_o %*% Ypar_o + Y.par[col_A]
                 EYA1 <- getLinkinv(fam[["Y"]])(etaA1)
                 
                 #Numerator is for disadvantaged group
-                #Using probs0 because m = 0
-                numer <- EYA1 * probs0
+                #Using first col of probs because m = 0
+                numer <- EYA1 * probs[,1]
                 
                 #Denominator is as if A = 0
-                #Using probs0 because m = 0
-                denom <- EYA0 * probs0
+                #Using first col of probs because m = 0
+                denom <- EYA0 * probs[,1]
                 
             } else {
                 
                 #Linear predictor A = 0 is just non-A-related linear predictor
                 etaA0 <- Ymat_o %*% Ypar_o + Y.par[col_M[m]]
-                etaA1 <- Ymat_o %*% Ypar_o + Y.par[col_M[m]] + Y.par[col_A_XmatY]
+                etaA1 <- Ymat_o %*% Ypar_o + Y.par[col_M[m]] + Y.par[col_A]
                 
                 #Add interaction term if necessary
                 #Don't need to worry about interaction for A = 0
@@ -168,11 +168,12 @@ calculateARD <- function(Yval = 1){
                 EYA1 <- getLinkinv(fam[["Y"]])(etaA1)
                 
                 #Numerator is for disadvantaged group (A = 1)
-                #Using probs0 because m = 0
-                numer <- numer + EYA1 * probs[,m]
+                #Using (m+1)th col of probs because M = m
+                numer <- numer + EYA1 * probs[,(m+1)]
                 
                 #Denominator is as if A = 0
-                denom <- denom + EYA0 * probs[,m]
+                #Using (m+1)th col of probs because M = m
+                denom <- denom + EYA0 * probs[,(m+1)]
                 
             } #End branching based on m value
             
@@ -192,3 +193,4 @@ calculateARD <- function(Yval = 1){
     return(ARD)
 
 }
+
