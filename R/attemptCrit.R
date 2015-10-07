@@ -19,7 +19,7 @@
 #' ##Should work
 #' attemptCrit(mydraw, myval, 1000, mean = 1, sd = 10)
 #' ##Should fail
-#' attemptCrit(mydraw, myval, 10, mean = -100, sd = 0.01)
+#' #attemptCrit(mydraw, myval, 10, mean = -100, sd = 0.01)
 #' 
 attemptCrit <- function(mainFun, valFun, maxAttempts, ...){
     for (attemptNum in 1:maxAttempts){
