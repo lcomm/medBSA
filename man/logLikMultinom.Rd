@@ -4,12 +4,12 @@
 \alias{logLikMultinom}
 \title{Calculate log-likelihood of multinomial random variable}
 \usage{
-logLikMultinom(v, par, Xmat = NULL, summation = TRUE)
+logLikMultinom(v, par.v, Xmat = NULL, summation = TRUE)
 }
 \arguments{
 \item{v}{String containing variable name}
 
-\item{par}{Parameter vector of regression coefficients}
+\item{par.v}{Parameter vector of regression coefficients}
 
 \item{Xmat}{Optional design matrix for computing log-likelihood; if none is
 specified, Xmats[[v]] is used}
