@@ -63,7 +63,8 @@ drawParamFromMLE <- function(v){
         if (!(sum(outcome) == nrow(outcome))) {
             outcome <- cbind(1 - rowSums(outcome), outcome)
         }
-        MLfit <- vglm(outcome ~ -1 + as.matrix(Xmats[[v]]), family = multinomial(parallel = FALSE, ref = 1))
+        MLfit <- vglm(outcome ~ -1 + as.matrix(Xmats[[v]]), family = multinomial(parallel = FALSE, ref = 1),
+                      crit = "coef", epsilon = 1e-09)
         
         #Save proposal information
         props[[v]][["mean"]] <<- coef(MLfit)
