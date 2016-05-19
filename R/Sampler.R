@@ -1,7 +1,8 @@
 #Sampling script I will eventually function-ize for R package purposes
+library("Rcpp")
 
-source("./Summer 2015 Private/medBSA/R/Rcpp_functions.R")
-load("./Summer 2015 Private/BSA_MWE_data")
+source("./R/")
+load("../BSA_MWE_data")
 
 library("mvtnorm")
 
@@ -47,6 +48,10 @@ family_M <- "binomial"
 if (family_M == "multinomial"){
     dM <- function(y, p_mat, log = FALSE){
         dMultinom(probs = p_mat, y = y, lg = log)
+    }
+
+    propose_M_coef <- function(){
+
     }
 } else if (family_M == "binomial"){
     dM <- function(y, p_vec, log = FALSE){
