@@ -180,6 +180,7 @@ Rcpp::NumericMatrix expit(Rcpp::NumericMatrix x){
 //' @export
 //'
 // [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::export(ll_logisticReg)]]
 arma::vec ll_logisticReg(arma::vec& out_v,
                          arma::vec& coef_v,
                          arma::mat& des_m){
@@ -197,11 +198,11 @@ arma::vec ll_logisticReg(arma::vec& out_v,
 
     // calculate probability of outcome being one
     arma::vec probs = (des_m*coef_v);
-    probs.transform( [](double val) { return expit_double(val); } );
+    probs = 1./(1. + arma::exp(-probs));
 
     // extract correct probability
     for (int i = 0; i < n; i++){
-        if ((i) == 1){
+        if (out_v(i) == 1){
             ans(i) = probs(i);
         } else {
             ans(i) = 1 - probs(i);
