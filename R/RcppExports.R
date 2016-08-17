@@ -18,6 +18,7 @@ rcpparma_bothproducts <- function(x) {
 }
 
 #' Select elements from a matrix based on a vector of column indices
+#' (Rcpp version)
 #'
 #' From a matrix and a vector, return a vector where the ith element is the
 #' matrix element (i, v[i])
@@ -26,16 +27,19 @@ rcpparma_bothproducts <- function(x) {
 #'
 #' @param M The n by m matrix
 #' @param v The length-n vector taking integer values 1 to m
+#' @return Vector of what was in each column
+#' @export
+#'
 column_picker <- function(M, v) {
-    .Call('medBSA_column_pickerCpp', PACKAGE = 'medBSA', M, v)
+    .Call('medBSA_column_picker_Rcpp', PACKAGE = 'medBSA', M, v)
 }
 
 normalize_rows <- function(M) {
     .Call('medBSA_normalize_rowsCpp', PACKAGE = 'medBSA', M)
 }
 
-getbcl <- function(design_mat, coef_mat) {
-    .Call('medBSA_getbcl', PACKAGE = 'medBSA', design_mat, coef_mat)
+get_BCL_probs <- function(des_m, coef_m) {
+    .Call('medBSA_get_BCL_probs_Cpp', PACKAGE = 'medBSA', des_m, coef_m)
 }
 
 expit <- function(x) {
@@ -46,12 +50,20 @@ ll_U <- function(U, XmatU, coef_U) {
     .Call('medBSA_ll_U_Cpp', PACKAGE = 'medBSA', U, XmatU, coef_U)
 }
 
-ll_M <- function(M, XmatM, coef_m) {
-    .Call('medBSA_ll_M_Cpp', PACKAGE = 'medBSA', M, XmatM, coef_m)
+ll_M <- function(M, XmatM, coef_M) {
+    .Call('medBSA_ll_M_Cpp', PACKAGE = 'medBSA', M, XmatM, coef_M)
+}
+
+ll_BCLReg <- function(out_v, coef_m, des_m) {
+    .Call('medBSA_ll_BCLReg_Cpp', PACKAGE = 'medBSA', out_v, coef_m, des_m)
 }
 
 ll_Y <- function(Y, XmatY, coef_Y) {
     .Call('medBSA_ll_Y_Cpp', PACKAGE = 'medBSA', Y, XmatY, coef_Y)
+}
+
+get_pU1 <- function(XmatM_U0, XmatM_U1, coef_M, M, XmatY_U0, XmatY_U1, coef_Y, Y, XmatU, coef_U) {
+    .Call('medBSA_get_pU1_Cpp', PACKAGE = 'medBSA', XmatM_U0, XmatM_U1, coef_M, M, XmatY_U0, XmatY_U1, coef_Y, Y, XmatU, coef_U)
 }
 
 dU <- function(coef_U, Z, A, U, lg) {
@@ -66,11 +78,7 @@ dM <- function(coef_M, Z, A, U, asmM, M, lg) {
     .Call('medBSA_dM_Cpp', PACKAGE = 'medBSA', coef_M, Z, A, U, asmM, M, lg)
 }
 
-get_pU1 <- function(Z, Y, A, asmM, M, coef_M, coef_Y, coef_U) {
-    .Call('medBSA_get_pU1_Cpp', PACKAGE = 'medBSA', Z, Y, A, asmM, M, coef_M, coef_Y, coef_U)
-}
-
 calc_ARD <- function(coef_M, Z, U, coef_Y, intx) {
-    .Call('medBSA_calc_ARD_Cpp', PACKAGE = 'medBSA', coef_M, Z, U, coef_Y, intx)
+    .Call('medBSA_calc_ARD_old_Cpp', PACKAGE = 'medBSA', coef_M, Z, U, coef_Y, intx)
 }
 

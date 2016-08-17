@@ -4,12 +4,12 @@
 \alias{rbern}
 \title{Sample Bernoulli random variables}
 \usage{
-rbern(prob, n = length(prob), ...)
+rbern(prob, n = length(prob))
 }
 \arguments{
 \item{prob}{Scalar or vector of probabilities}
 
-\item{n}{The number of Bernoulli random variable, in case there is a common probability. 
+\item{n}{The number of Bernoulli random variable, in case there is a common probability.
 Defaults to the length of prob}
 }
 \value{
@@ -20,7 +20,6 @@ Shortcut wrapper for rbinom()
 }
 \examples{
 ##Generate variables with all different probabilities
-rbern(seq(0.05,0.95,0.05)) 
-
+rbern(seq(0.05,0.95,0.05))
 }
 

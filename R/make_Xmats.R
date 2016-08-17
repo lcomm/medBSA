@@ -6,8 +6,7 @@
 #'
 #' @export
 make_Xmat <- function(formula, data, ...){
-    Xmat <- model.matrix(formula, nrow = nrow(data), data = data,
-                         ...)
+    Xmat <- model.matrix(formula, nrow = nrow(data), data = data, ...)
     coef_names <- colnames(Xmat)
     Xmat <- matrix(Xmat, nrow = nrow(data))
     colnames(Xmat) <- coef_names
@@ -38,5 +37,4 @@ make_Xmat_set <- function(formula, data, varname, val){
         return(make_Xmat(formula, data))
     }
 }
-
 
