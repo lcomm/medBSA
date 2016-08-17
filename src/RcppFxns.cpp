@@ -159,7 +159,6 @@ Rcpp::NumericMatrix expit(Rcpp::NumericMatrix x){
 //' @export
 //'
 // [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export(ll_logisticReg)]]
 arma::vec ll_logisticReg(arma::vec& out_v,
                          arma::vec& coef_v,
                          arma::mat& des_m){
@@ -191,6 +190,64 @@ arma::vec ll_logisticReg(arma::vec& out_v,
     // return log-likelihood vector
     return log(ans);
 }
+
+//' Calculate U part of likelihood (take 2)
+//' @param U Vector containing U
+//' @param XmatU Design matrix for U outcome model
+//' @param coef_U Coefficient vector for U regression
+//' @export
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::export(ll_U)]]
+arma::vec ll_U_Cpp(arma::vec U, arma::mat XmatU, arma::vec coef_U){
+    return ll_logisticReg(U, coef_U, XmatU);
+}
+
+
+//' Calculate M part of likelihood (take 2)
+//' @param M Vector containing M
+//' @param XmatM Design matrix for M outcome model
+//' @param coef_M Coefficient matrix for M regression
+//' @export
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::export(ll_M)]]
+arma::vec ll_M_Cpp(arma::vec M, arma::mat XmatM, arma::mat coef_m){
+    //TODO implement
+    return M;
+}
+
+
+
+//' Calculate Y part of likelihood (take 2)
+//' @param Y Vector containing Y
+//' @param XmatY Design matrix for Y outcome model
+//' @param coef_Y Coefficient vector for Y regression
+//' @export
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::export(ll_Y)]]
+arma::vec ll_Y_Cpp(arma::vec Y, arma::mat XmatY, arma::vec coef_Y){
+    return ll_logisticReg(Y, coef_Y, XmatY);
+}
+
+
+//' Calculate full conditional P(U=1) for imputation
+//'
+// [[Rcpp::depends(RcppArmadillo)]]
+arma::vec pU1(arma::mat& XmatM_U0,
+              arma::mat& XmatM_U1,
+              arma::mat  coef_M,
+              arma::vec& M,
+              arma::mat& XmatY_U0,
+              arma::mat& XmatY_U1,
+              arma::vec  coef_Y,
+              arma::vec& Y,
+              arma::mat& XmatU,
+              arma::vec  coef_U){
+    //TODO implement this
+    // U = 1
+    return coef_Y;
+}
+
+
 
 
 //' Calculate U part of likelihood

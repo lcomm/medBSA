@@ -95,16 +95,42 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// ll_logisticReg
-arma::vec ll_logisticReg(arma::vec& out_v, arma::vec& coef_v, arma::mat& des_m);
-RcppExport SEXP medBSA_ll_logisticReg(SEXP out_vSEXP, SEXP coef_vSEXP, SEXP des_mSEXP) {
+// ll_U_Cpp
+arma::vec ll_U_Cpp(arma::vec U, arma::mat XmatU, arma::vec coef_U);
+RcppExport SEXP medBSA_ll_U_Cpp(SEXP USEXP, SEXP XmatUSEXP, SEXP coef_USEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< arma::vec& >::type out_v(out_vSEXP);
-    Rcpp::traits::input_parameter< arma::vec& >::type coef_v(coef_vSEXP);
-    Rcpp::traits::input_parameter< arma::mat& >::type des_m(des_mSEXP);
-    __result = Rcpp::wrap(ll_logisticReg(out_v, coef_v, des_m));
+    Rcpp::traits::input_parameter< arma::vec >::type U(USEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type XmatU(XmatUSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type coef_U(coef_USEXP);
+    __result = Rcpp::wrap(ll_U_Cpp(U, XmatU, coef_U));
+    return __result;
+END_RCPP
+}
+// ll_M_Cpp
+arma::vec ll_M_Cpp(arma::vec M, arma::mat XmatM, arma::mat coef_m);
+RcppExport SEXP medBSA_ll_M_Cpp(SEXP MSEXP, SEXP XmatMSEXP, SEXP coef_mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::vec >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type XmatM(XmatMSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type coef_m(coef_mSEXP);
+    __result = Rcpp::wrap(ll_M_Cpp(M, XmatM, coef_m));
+    return __result;
+END_RCPP
+}
+// ll_Y_Cpp
+arma::vec ll_Y_Cpp(arma::vec Y, arma::mat XmatY, arma::vec coef_Y);
+RcppExport SEXP medBSA_ll_Y_Cpp(SEXP YSEXP, SEXP XmatYSEXP, SEXP coef_YSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::vec >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type XmatY(XmatYSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type coef_Y(coef_YSEXP);
+    __result = Rcpp::wrap(ll_Y_Cpp(Y, XmatY, coef_Y));
     return __result;
 END_RCPP
 }

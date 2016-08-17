@@ -42,8 +42,16 @@ expit <- function(x) {
     .Call('medBSA_expit_double', PACKAGE = 'medBSA', x)
 }
 
-ll_logisticReg <- function(out_v, coef_v, des_m) {
-    .Call('medBSA_ll_logisticReg', PACKAGE = 'medBSA', out_v, coef_v, des_m)
+ll_U <- function(U, XmatU, coef_U) {
+    .Call('medBSA_ll_U_Cpp', PACKAGE = 'medBSA', U, XmatU, coef_U)
+}
+
+ll_M <- function(M, XmatM, coef_m) {
+    .Call('medBSA_ll_M_Cpp', PACKAGE = 'medBSA', M, XmatM, coef_m)
+}
+
+ll_Y <- function(Y, XmatY, coef_Y) {
+    .Call('medBSA_ll_Y_Cpp', PACKAGE = 'medBSA', Y, XmatY, coef_Y)
 }
 
 dU <- function(coef_U, Z, A, U, lg) {
