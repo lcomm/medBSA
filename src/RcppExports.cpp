@@ -49,15 +49,15 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// column_pickerCpp
-Rcpp::NumericVector column_pickerCpp(Rcpp::NumericMatrix M, Rcpp::IntegerVector v);
-RcppExport SEXP medBSA_column_pickerCpp(SEXP MSEXP, SEXP vSEXP) {
+// column_picker_Rcpp
+Rcpp::NumericVector column_picker_Rcpp(Rcpp::NumericMatrix M, Rcpp::IntegerVector v);
+RcppExport SEXP medBSA_column_picker_Rcpp(SEXP MSEXP, SEXP vSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
     Rcpp::traits::input_parameter< Rcpp::NumericMatrix >::type M(MSEXP);
     Rcpp::traits::input_parameter< Rcpp::IntegerVector >::type v(vSEXP);
-    __result = Rcpp::wrap(column_pickerCpp(M, v));
+    __result = Rcpp::wrap(column_picker_Rcpp(M, v));
     return __result;
 END_RCPP
 }
@@ -72,15 +72,15 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// getbcl
-arma::mat getbcl(arma::mat design_mat, arma::mat coef_mat);
-RcppExport SEXP medBSA_getbcl(SEXP design_matSEXP, SEXP coef_matSEXP) {
+// get_BCL_probs_Cpp
+arma::mat get_BCL_probs_Cpp(arma::mat des_m, arma::mat coef_m);
+RcppExport SEXP medBSA_get_BCL_probs_Cpp(SEXP des_mSEXP, SEXP coef_mSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< arma::mat >::type design_mat(design_matSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type coef_mat(coef_matSEXP);
-    __result = Rcpp::wrap(getbcl(design_mat, coef_mat));
+    Rcpp::traits::input_parameter< arma::mat >::type des_m(des_mSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type coef_m(coef_mSEXP);
+    __result = Rcpp::wrap(get_BCL_probs_Cpp(des_m, coef_m));
     return __result;
 END_RCPP
 }
@@ -109,15 +109,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // ll_M_Cpp
-arma::vec ll_M_Cpp(arma::vec M, arma::mat XmatM, arma::mat coef_m);
-RcppExport SEXP medBSA_ll_M_Cpp(SEXP MSEXP, SEXP XmatMSEXP, SEXP coef_mSEXP) {
+arma::vec ll_M_Cpp(arma::vec& M, arma::mat& XmatM, arma::mat coef_M);
+RcppExport SEXP medBSA_ll_M_Cpp(SEXP MSEXP, SEXP XmatMSEXP, SEXP coef_MSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< arma::vec >::type M(MSEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type XmatM(XmatMSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type XmatM(XmatMSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type coef_M(coef_MSEXP);
+    __result = Rcpp::wrap(ll_M_Cpp(M, XmatM, coef_M));
+    return __result;
+END_RCPP
+}
+// ll_BCLReg_Cpp
+arma::vec ll_BCLReg_Cpp(arma::vec& out_v, arma::mat coef_m, arma::mat& des_m);
+RcppExport SEXP medBSA_ll_BCLReg_Cpp(SEXP out_vSEXP, SEXP coef_mSEXP, SEXP des_mSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::vec& >::type out_v(out_vSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type coef_m(coef_mSEXP);
-    __result = Rcpp::wrap(ll_M_Cpp(M, XmatM, coef_m));
+    Rcpp::traits::input_parameter< arma::mat& >::type des_m(des_mSEXP);
+    __result = Rcpp::wrap(ll_BCLReg_Cpp(out_v, coef_m, des_m));
     return __result;
 END_RCPP
 }
@@ -131,6 +144,26 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type XmatY(XmatYSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type coef_Y(coef_YSEXP);
     __result = Rcpp::wrap(ll_Y_Cpp(Y, XmatY, coef_Y));
+    return __result;
+END_RCPP
+}
+// get_pU1_Cpp
+arma::vec get_pU1_Cpp(arma::mat& XmatM_U0, arma::mat& XmatM_U1, arma::mat coef_M, arma::vec& M, arma::mat& XmatY_U0, arma::mat& XmatY_U1, arma::vec coef_Y, arma::vec& Y, arma::mat& XmatU, arma::vec coef_U);
+RcppExport SEXP medBSA_get_pU1_Cpp(SEXP XmatM_U0SEXP, SEXP XmatM_U1SEXP, SEXP coef_MSEXP, SEXP MSEXP, SEXP XmatY_U0SEXP, SEXP XmatY_U1SEXP, SEXP coef_YSEXP, SEXP YSEXP, SEXP XmatUSEXP, SEXP coef_USEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< arma::mat& >::type XmatM_U0(XmatM_U0SEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type XmatM_U1(XmatM_U1SEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type coef_M(coef_MSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type M(MSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type XmatY_U0(XmatY_U0SEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type XmatY_U1(XmatY_U1SEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type coef_Y(coef_YSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type XmatU(XmatUSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type coef_U(coef_USEXP);
+    __result = Rcpp::wrap(get_pU1_Cpp(XmatM_U0, XmatM_U1, coef_M, M, XmatY_U0, XmatY_U1, coef_Y, Y, XmatU, coef_U));
     return __result;
 END_RCPP
 }
@@ -184,27 +217,9 @@ BEGIN_RCPP
     return __result;
 END_RCPP
 }
-// get_pU1_Cpp
-arma::vec get_pU1_Cpp(const arma::mat& Z, const arma::vec& Y, const arma::vec& A, const arma::mat& asmM, const arma::vec& M, const arma::mat& coef_M, const arma::vec& coef_Y, const arma::vec& coef_U);
-RcppExport SEXP medBSA_get_pU1_Cpp(SEXP ZSEXP, SEXP YSEXP, SEXP ASEXP, SEXP asmMSEXP, SEXP MSEXP, SEXP coef_MSEXP, SEXP coef_YSEXP, SEXP coef_USEXP) {
-BEGIN_RCPP
-    Rcpp::RObject __result;
-    Rcpp::RNGScope __rngScope;
-    Rcpp::traits::input_parameter< const arma::mat& >::type Z(ZSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type Y(YSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type A(ASEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type asmM(asmMSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type M(MSEXP);
-    Rcpp::traits::input_parameter< const arma::mat& >::type coef_M(coef_MSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type coef_Y(coef_YSEXP);
-    Rcpp::traits::input_parameter< const arma::vec& >::type coef_U(coef_USEXP);
-    __result = Rcpp::wrap(get_pU1_Cpp(Z, Y, A, asmM, M, coef_M, coef_Y, coef_U));
-    return __result;
-END_RCPP
-}
-// calc_ARD_Cpp
-double calc_ARD_Cpp(const arma::mat& coef_M, const arma::mat& Z, const arma::vec& U, const arma::vec& coef_Y, bool intx);
-RcppExport SEXP medBSA_calc_ARD_Cpp(SEXP coef_MSEXP, SEXP ZSEXP, SEXP USEXP, SEXP coef_YSEXP, SEXP intxSEXP) {
+// calc_ARD_old_Cpp
+double calc_ARD_old_Cpp(const arma::mat& coef_M, const arma::mat& Z, const arma::vec& U, const arma::vec& coef_Y, bool intx);
+RcppExport SEXP medBSA_calc_ARD_old_Cpp(SEXP coef_MSEXP, SEXP ZSEXP, SEXP USEXP, SEXP coef_YSEXP, SEXP intxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject __result;
     Rcpp::RNGScope __rngScope;
@@ -213,7 +228,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::vec& >::type U(USEXP);
     Rcpp::traits::input_parameter< const arma::vec& >::type coef_Y(coef_YSEXP);
     Rcpp::traits::input_parameter< bool >::type intx(intxSEXP);
-    __result = Rcpp::wrap(calc_ARD_Cpp(coef_M, Z, U, coef_Y, intx));
+    __result = Rcpp::wrap(calc_ARD_old_Cpp(coef_M, Z, U, coef_Y, intx));
     return __result;
 END_RCPP
 }

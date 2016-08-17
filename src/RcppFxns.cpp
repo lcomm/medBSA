@@ -2,6 +2,7 @@
 
 
 //' Select elements from a matrix based on a vector of column indices
+//' (Rcpp version)
 //'
 //' From a matrix and a vector, return a vector where the ith element is the
 //' matrix element (i, v[i])
@@ -10,8 +11,13 @@
 //'
 //' @param M The n by m matrix
 //' @param v The length-n vector taking integer values 1 to m
+//' @return Vector of what was in each column
+//' @export
+//'
 // [[Rcpp::export(column_picker)]]
-Rcpp::NumericVector column_pickerCpp(Rcpp::NumericMatrix M, Rcpp::IntegerVector v){
+Rcpp::NumericVector column_picker_Rcpp(Rcpp::NumericMatrix M,
+                                       Rcpp::IntegerVector v){
+
     // get dimensions of matrix
     int n = M.nrow();
 
@@ -33,6 +39,41 @@ Rcpp::NumericVector column_pickerCpp(Rcpp::NumericMatrix M, Rcpp::IntegerVector 
 }
 
 
+//' Select elements from a matrix based on a vector of column indices
+//' (RcppArmadillo version)
+//'
+//' From a matrix and a vector, return a vector where the ith element is the
+//' matrix element (i, v[i])
+//'
+//' @param M The n by m matrix
+//' @param v The length-n vector taking integer values 1 to m
+//' @return Vector of what was in each column
+//'
+// [[Rcpp::depends(RcppArmadillo)]]
+arma::vec column_picker_arma(arma::mat M,
+                             arma::vec v){
+
+    // get dimensions of matrix
+    // eliminate signed/unsigned int comparison
+    unsigned int n = M.n_rows;
+
+    // basic argument checking
+    if ((arma::min(v) < 1) | (arma::max(v) > M.n_cols) | (v.n_elem != n)){
+        throw std::out_of_range("Incompatible M and v arguments");
+    }
+
+    // initialize
+    arma::vec ans(n);
+
+    // extract matrix element corresponding to column (warning: zero indexing!)
+    for (unsigned int i = 0; i < n; i++) {
+        ans(i) = M(i, v(i)-1);
+    }
+
+    // return
+    return(ans);
+}
+
 
 
 //' Normalize rows to sum to 1
@@ -45,7 +86,6 @@ Rcpp::NumericVector column_pickerCpp(Rcpp::NumericMatrix M, Rcpp::IntegerVector 
 //' @param M The matrix with rows in need of normalization
 //'
 //' @export
-//'
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export(normalize_rows)]]
 arma::mat normalize_rowsCpp(arma::mat M){
@@ -62,26 +102,6 @@ arma::mat normalize_rowsCpp(arma::mat M){
 
 
 
-
-//' Make design matrix for mediator model
-//'
-//' @param Z Confounder matrix
-//' @param A Exposure/treatment vector
-//' @param U Unmeasured confounder vector
-// [[Rcpp::depends(RcppArmadillo)]]
-arma::mat make_XmatM(arma::mat Z, arma::vec A, arma::vec U){
-    // output matrix of correct size
-    int n = Z.n_rows;
-    int ncolZ = Z.n_cols;
-    int k = 3 + ncolZ;
-    arma::mat out = arma::mat(n, k, arma::fill::ones);
-    for(int i = 1; i < ncolZ + 1; ++i) {
-        out.col(i) = Z.col(i - 1);
-    }
-    out.col(k-2) = A;
-    out.col(k-1) = U;
-    return out;
-}
 
 
 
@@ -100,19 +120,20 @@ arma::mat make_XmatM(arma::mat Z, arma::vec A, arma::vec U){
 //' number of columns should be equal to number of categories - 1
 //'
 // [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export]]
-arma::mat getbcl(arma::mat design_mat, arma::mat coef_mat){
+// [[Rcpp::export(get_BCL_probs)]]
+arma::mat get_BCL_probs_Cpp(arma::mat des_m,
+                            arma::mat coef_m){
 
     // basic parameter checking
-    if (coef_mat.n_rows != design_mat.n_cols){
+    if (coef_m.n_rows != des_m.n_cols){
         throw std::out_of_range("Design and coefficient matrices of incompatible sizes");
     }
 
     // add column of zeros, corresponding to reference level
-    coef_mat.insert_cols(0, 1);
+    coef_m.insert_cols(0, 1);
 
-    // divide exp of linear predictor by rowsums (normalize the rows)
-    arma::mat out = arma::exp(design_mat*coef_mat);
+    // divide exp of linear predictor by rowsums, normalizing
+    arma::mat out = arma::exp(des_m*coef_m);
     arma::vec rs = arma::sum(out, 1);
     out.each_col() /= rs;
 
@@ -210,11 +231,39 @@ arma::vec ll_U_Cpp(arma::vec U, arma::mat XmatU, arma::vec coef_U){
 //' @export
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export(ll_M)]]
-arma::vec ll_M_Cpp(arma::vec M, arma::mat XmatM, arma::mat coef_m){
+arma::vec ll_M_Cpp(arma::vec& M,
+                   arma::mat& XmatM,
+                   arma::mat  coef_M){
     //TODO implement
+    // get probabilities from BCL model
+    arma::mat probs = get_BCL_probs_Cpp(XmatM, coef_M);
+
+    // e
     return M;
 }
 
+//' Calculate log-likelihood for baseline category logit
+//' regression model
+//'
+//' @param out_v Vector of integers denoting outcome (ref=1)
+//' @param coef_m Regression coefficient matrix
+//' @param des_m Design matrix for regression
+//' @export
+//'
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::export(ll_BCLReg)]]
+arma::vec ll_BCLReg_Cpp(arma::vec& out_v,
+                        arma::mat  coef_m,
+                        arma::mat& des_m){
+
+    // get probabilities from BCL model
+    arma::mat probs = get_BCL_probs_Cpp(des_m, coef_m);
+
+    // extract relevant probability
+    arma::vec ans = column_picker_arma(probs, out_v);
+    return ans;
+
+}
 
 
 //' Calculate Y part of likelihood (take 2)
@@ -231,20 +280,41 @@ arma::vec ll_Y_Cpp(arma::vec Y, arma::mat XmatY, arma::vec coef_Y){
 
 //' Calculate full conditional P(U=1) for imputation
 //'
+//' //TODO: Finish this description/params
+//' @export
+//'
 // [[Rcpp::depends(RcppArmadillo)]]
-arma::vec pU1(arma::mat& XmatM_U0,
-              arma::mat& XmatM_U1,
-              arma::mat  coef_M,
-              arma::vec& M,
-              arma::mat& XmatY_U0,
-              arma::mat& XmatY_U1,
-              arma::vec  coef_Y,
-              arma::vec& Y,
-              arma::mat& XmatU,
-              arma::vec  coef_U){
-    //TODO implement this
-    // U = 1
-    return coef_Y;
+// [[Rcpp::export(get_pU1)]]
+arma::vec get_pU1_Cpp(arma::mat& XmatM_U0,
+                      arma::mat& XmatM_U1,
+                      arma::mat  coef_M,
+                      arma::vec& M,
+                      arma::mat& XmatY_U0,
+                      arma::mat& XmatY_U1,
+                      arma::vec  coef_Y,
+                      arma::vec& Y,
+                      arma::mat& XmatU,
+                      arma::vec  coef_U){
+
+    // useful premade objects
+    int n = XmatU.n_rows;
+    arma::vec all_ones(n, arma::fill::ones);
+    arma::vec all_zeros(n, arma::fill::zeros);
+
+    // likelihoods if U = 1
+    arma::vec fU1 = ll_Y_Cpp(Y, XmatY_U1, coef_Y) +
+                    ll_M_Cpp(M, XmatM_U1, coef_M) +
+                    ll_U_Cpp(all_ones, XmatU, coef_U);
+
+    // likelihoods if U = 1
+    arma::vec fU0 = ll_Y_Cpp(Y, XmatY_U0, coef_Y) +
+                    ll_M_Cpp(M, XmatM_U0, coef_M) +
+                    ll_U_Cpp(all_zeros, XmatU, coef_U);
+
+    // normalize to get P(U=1) for gibbs step
+    // exponentiate to get off of log scale
+    arma::vec pU1 = arma::exp(fU1)/(arma::exp(fU1) + arma::exp(fU0));
+    return pU1;
 }
 
 
@@ -380,42 +450,6 @@ arma::mat dM_Cpp(const arma::mat& coef_M,
 
 
 
-//' Get P(U=1) for imputation
-//'
-//' Based on M, Y, and U regression coefficients and data
-//' @export
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export(get_pU1)]]
-arma::vec get_pU1_Cpp(const arma::mat& Z,
-                       const arma::vec& Y,
-                       const arma::vec& A,
-                       const arma::mat& asmM,
-                       const arma::vec& M,
-                       const arma::mat& coef_M,
-                       const arma::vec& coef_Y,
-                       const arma::vec& coef_U){
-    //figure out n and dimension of Z
-    int n = Z.n_rows;
-
-    //vectors of all ones and zeros
-    arma::vec allones = arma::ones(n);
-    arma::vec allzeros = arma::zeros(n);
-
-    // likelihoods for U = 1 and U = 0
-    arma::vec U1 = dM_Cpp(coef_M, Z, A, allones, asmM, M, true) +
-                   dU_Cpp(coef_U, Z, A, allones, true) +
-                   dY_Cpp(coef_Y, Z, A, asmM, allones, Y, true, true);
-    arma::vec U0 = dM_Cpp(coef_M, Z, A, allzeros, asmM, M, true) +
-                   dU_Cpp(coef_U, Z, A, allzeros, true) +
-                   dY_Cpp(coef_Y, Z, A, asmM, allzeros, Y, true, true);
-
-    // P(U = 1)
-    arma::vec eU1 = exp(U1);
-    arma::vec pU1 = eU1/(eU1 + exp(U0));
-
-    return(pU1);
-}
-
 
 
 
@@ -424,7 +458,7 @@ arma::vec get_pU1_Cpp(const arma::mat& Z,
 //' @export
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export(calc_ARD)]]
-double calc_ARD_Cpp(const arma::mat& coef_M,
+double calc_ARD_old_Cpp(const arma::mat& coef_M,
                        const arma::mat& Z,
                        const arma::vec& U,
                        const arma::vec& coef_Y,
@@ -449,7 +483,7 @@ double calc_ARD_Cpp(const arma::mat& coef_M,
     XmatM.col(dimZ + 2) = U;
 
     // make probabilities
-    probsM.tail_cols(K - 1) = exp(XmatM * coef_M);
+    probsM.tail_cols(K - 1) = arma::exp(XmatM * coef_M);
     probsM.each_col() /= arma::sum(probsM, 1);
 
     /**************************************/
@@ -478,3 +512,5 @@ double calc_ARD_Cpp(const arma::mat& coef_M,
     double ans = arma::as_scalar(arma::mean(RD));
     return ans;
 }
+
+
