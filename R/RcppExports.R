@@ -46,6 +46,14 @@ expit <- function(x) {
     .Call('medBSA_expit_double', PACKAGE = 'medBSA', x)
 }
 
+ll_logisticReg <- function(out_v, coef_v, des_m) {
+    .Call('medBSA_ll_logisticReg', PACKAGE = 'medBSA', out_v, coef_v, des_m)
+}
+
+ll_BCLReg <- function(out_v, coef_m, des_m) {
+    .Call('medBSA_ll_BCLReg_Cpp', PACKAGE = 'medBSA', out_v, coef_m, des_m)
+}
+
 ll_U <- function(U, XmatU, coef_U) {
     .Call('medBSA_ll_U_Cpp', PACKAGE = 'medBSA', U, XmatU, coef_U)
 }
@@ -54,28 +62,12 @@ ll_M <- function(M, XmatM, coef_M) {
     .Call('medBSA_ll_M_Cpp', PACKAGE = 'medBSA', M, XmatM, coef_M)
 }
 
-ll_BCLReg <- function(out_v, coef_m, des_m) {
-    .Call('medBSA_ll_BCLReg_Cpp', PACKAGE = 'medBSA', out_v, coef_m, des_m)
-}
-
 ll_Y <- function(Y, XmatY, coef_Y) {
     .Call('medBSA_ll_Y_Cpp', PACKAGE = 'medBSA', Y, XmatY, coef_Y)
 }
 
 get_pU1 <- function(XmatM_U0, XmatM_U1, coef_M, M, XmatY_U0, XmatY_U1, coef_Y, Y, XmatU, coef_U) {
     .Call('medBSA_get_pU1_Cpp', PACKAGE = 'medBSA', XmatM_U0, XmatM_U1, coef_M, M, XmatY_U0, XmatY_U1, coef_Y, Y, XmatU, coef_U)
-}
-
-dU <- function(coef_U, Z, A, U, lg) {
-    .Call('medBSA_dU_Cpp', PACKAGE = 'medBSA', coef_U, Z, A, U, lg)
-}
-
-dY <- function(coef_Y, Z, A, asmM, U, Y, intx, lg) {
-    .Call('medBSA_dY_Cpp', PACKAGE = 'medBSA', coef_Y, Z, A, asmM, U, Y, intx, lg)
-}
-
-dM <- function(coef_M, Z, A, U, asmM, M, lg) {
-    .Call('medBSA_dM_Cpp', PACKAGE = 'medBSA', coef_M, Z, A, U, asmM, M, lg)
 }
 
 calc_ARD <- function(coef_M, Z, U, coef_Y, intx) {

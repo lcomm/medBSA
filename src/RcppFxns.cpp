@@ -213,6 +213,32 @@ arma::vec ll_logisticReg(arma::vec& out_v,
     return log(ans);
 }
 
+
+//' Calculate log-likelihood for baseline category logit
+//' regression model
+//'
+//' @param out_v Vector of integers denoting outcome (ref=1)
+//' @param coef_m Regression coefficient matrix
+//' @param des_m Design matrix for regression
+//' @export
+//'
+// [[Rcpp::depends(RcppArmadillo)]]
+// [[Rcpp::export(ll_BCLReg)]]
+arma::vec ll_BCLReg_Cpp(arma::vec& out_v,
+                        arma::mat  coef_m,
+                        arma::mat& des_m){
+
+    // get probabilities from BCL model
+    arma::mat probs = get_BCL_probs_Cpp(des_m, coef_m);
+
+    // extract relevant probability
+    // take log so we return log-likelihood
+    arma::vec ans = arma::log(column_picker_arma(probs, out_v));
+    return ans;
+
+}
+
+
 //' Calculate U part of likelihood (take 2)
 //' @param U Vector containing U
 //' @param XmatU Design matrix for U outcome model
@@ -235,36 +261,11 @@ arma::vec ll_U_Cpp(arma::vec U, arma::mat XmatU, arma::vec coef_U){
 arma::vec ll_M_Cpp(arma::vec& M,
                    arma::mat& XmatM,
                    arma::mat  coef_M){
-    //TODO implement
-    // get probabilities from BCL model
-    arma::mat probs = get_BCL_probs_Cpp(XmatM, coef_M);
-
-    // e
-    return M;
+    // TODO implement branches based on M binary/categorical
+    return ll_BCLReg_Cpp(M, coef_M, XmatM);
 }
 
-//' Calculate log-likelihood for baseline category logit
-//' regression model
-//'
-//' @param out_v Vector of integers denoting outcome (ref=1)
-//' @param coef_m Regression coefficient matrix
-//' @param des_m Design matrix for regression
-//' @export
-//'
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export(ll_BCLReg)]]
-arma::vec ll_BCLReg_Cpp(arma::vec& out_v,
-                        arma::mat  coef_m,
-                        arma::mat& des_m){
 
-    // get probabilities from BCL model
-    arma::mat probs = get_BCL_probs_Cpp(des_m, coef_m);
-
-    // extract relevant probability
-    arma::vec ans = column_picker_arma(probs, out_v);
-    return ans;
-
-}
 
 
 //' Calculate Y part of likelihood (take 2)
@@ -321,141 +322,10 @@ arma::vec get_pU1_Cpp(arma::mat& XmatM_U0,
 
 
 
-//' Calculate U part of likelihood
-//'
-//' @param coef_U U regression coefficient vector
-//' @param Z confounder matrix
-//' @param A exposure vector
-//' @param U value at U at which to evaluate the density
-//' @param lg whether log-density should be returned
-//' @export
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export(dU)]]
-arma::vec dU_Cpp(const arma::vec& coef_U,
-                 const arma::mat& Z,
-                 const arma::vec& A,
-                 const arma::vec& U,
-                 bool lg){
-    // useful quantities
-    int dimZ = Z.n_cols;
-    arma::vec allones = arma::ones(Z.n_rows);
-
-    // linear predictor
-    arma::vec out = coef_U(0) +
-                    Z * coef_U.subvec(1, dimZ) +
-                    A * coef_U(dimZ + 1);
-    // convert to probability by applying expit
-    out = expit(out);
-
-    // extract relevant probability based on U values
-    out = out % U + (allones - out) % (allones - U);
-
-    // return log or not based on lg
-    if (lg) return log(out); else return out;
-}
-
-
-//' Calculate Y part of likelihood
-//'
-//' @param coef_Y Y regression coefficient vector
-//' @param Z confounder matrix
-//' @param A exposure vector
-//' @param asmM Dummy matrix version of M
-//' @param U value at U at which to evaluate the density
-//' @param lg whether log-density should be returned
-//' @export
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export(dY)]]
-arma::vec dY_Cpp(const arma::vec& coef_Y,
-                 const arma::mat& Z,
-                 const arma::vec& A,
-                 const arma::mat& asmM,
-                 const arma::vec& U,
-                 const arma::vec& Y,
-                 bool intx, bool lg){
-    // useful quantities
-    int dimZ = Z.n_cols;
-    int dimM = asmM.n_cols;
-
-    // linear predictor
-    // order: 1, Z, A, M, U, AM (if interactions)
-    arma::vec out = coef_Y(0) +
-                    Z * coef_Y.subvec(1, dimZ) +
-                    A * coef_Y(dimZ + 1) +
-                    asmM * coef_Y.subvec(dimZ + 2, dimZ + dimM + 1) +
-                    U * coef_Y(dimZ + dimM + 2)
-                    ;
-    if (intx){
-        // add interaction parts
-        arma::mat interacts = asmM.each_col() % A;
-        out += interacts * coef_Y.tail(interacts.n_cols);
-    }
-
-    // convert to probability by applying expit
-    out = expit(out);
-
-    // extract relevant probability based on Y values
-    out = out % Y + (1 - out) % (1 - Y);
-
-    // return log or not based on lg
-    if (lg) return log(out); else return out;
-}
-
-
-
-
-
-//' Calculate M part of likelihood
-//'
-//' @param coef_M Coefficient matrix for M regression
-//' @param Z confounder matrix
-//' @param A exposure vector
-//' @param U unmeasured confounder U
-//' @param asmM Dummy matrix version of M at which to evaluate the density
-//' @param lg whether log-density should be returned
-//' @export
-// [[Rcpp::depends(RcppArmadillo)]]
-// [[Rcpp::export(dM)]]
-arma::mat dM_Cpp(const arma::mat& coef_M,
-                 const arma::mat& Z,
-                 const arma::vec& A,
-                 const arma::vec& U,
-                 const arma::mat& asmM,
-                 const arma::vec& M,
-                 bool lg){
-
-    // make matrix of probabilities
-    int dimZ = Z.n_cols;
-    int n = Z.n_rows;
-    int K = asmM.n_cols + 1;
-    arma::mat probs(n, K, arma::fill::ones);
-
-    // order of design matrix: 1, Z, A, U
-    arma::mat Xmat(n, dimZ + 3, arma::fill::ones);
-    Xmat.cols(1, dimZ) = Z;
-    Xmat.col(dimZ + 1) = A;
-    Xmat.col(dimZ + 2) = U;
-
-    // make probabilities
-    probs.tail_cols(K - 1) = exp(Xmat * coef_M);
-    probs.each_col() /= arma::sum(probs, 1);
-
-    // extract right probability
-    arma::vec out = arma::zeros(n);
-    for (int i = 0; i < n; i++) {
-        out(i) = probs(i, M(i)-1);
-    }
-    if (lg) return log(out); else return out;
-}
-
-
-
-
-
-
 
 //' Calculate ARD
 //'
+//' //TODO Update this to formula approach
 //' @export
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export(calc_ARD)]]
@@ -464,54 +334,8 @@ double calc_ARD_old_Cpp(const arma::mat& coef_M,
                        const arma::vec& U,
                        const arma::vec& coef_Y,
                        bool intx){
-    // useful quantities
-    int n = Z.n_rows;
-    int dimZ = Z.n_cols;
-    int dimM = coef_M.n_cols;
-    int K = dimM + 1;
 
-    /***********************************/
-    /* P(M=m|A=0,Z=z,U=u) calculation  */
-    /* (used as weight in num & denom) */
-    /***********************************/
-    // make matrix of probabilities of M equalling m
-    arma::mat probsM(n, K, arma::fill::ones);
-
-    // order of design matrix: 1, Z, A, U
-    arma::mat XmatM(n, dimZ + 3, arma::fill::ones);
-    XmatM.cols(1, dimZ) = Z;
-    XmatM.col(dimZ + 1).fill(0); //want under A=0 condition
-    XmatM.col(dimZ + 2) = U;
-
-    // make probabilities
-    probsM.tail_cols(K - 1) = arma::exp(XmatM * coef_M);
-    probsM.each_col() /= arma::sum(probsM, 1);
-
-    /**************************************/
-    /* P(Y=1|A=*,Z=z,U=u,M=m) calculation */
-    /* (*=1 for num, *=0 for denom)       */
-    /* (need for each m)                  */
-    /**************************************/
-    arma::vec allones = arma::ones<arma::vec>(n);
-    arma::vec allzeros = arma::zeros<arma::vec>(n);
-    arma::mat new_asmM(n, K, arma::fill::zeros);
-    arma::mat EYA0_mat(n, K);
-    arma::mat EYA1_mat(n, K);
-    for (int k=0; k<K; k++){
-        new_asmM.col(k).fill(1);
-        EYA0_mat.col(k) = dY_Cpp(coef_Y, Z, allzeros, new_asmM, U, allones, true, false);
-        EYA1_mat.col(k) = dY_Cpp(coef_Y, Z, allones, new_asmM, U, allones, true, false);
-        new_asmM.col(k).fill(0);
-    }
-
-    // Calculate ARD
-    // Sum over M by summing across rows, weighting by P(M=m)
-    // Take RR
-    // Then average RR over covariate distribution
-    arma::vec RD = arma::sum(EYA1_mat % probsM, 1) /
-                   arma::sum(EYA0_mat % probsM, 1);
-    double ans = arma::as_scalar(arma::mean(RD));
-    return ans;
+    return 1.0;
 }
 
 
