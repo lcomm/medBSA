@@ -1,6 +1,6 @@
 Package: medBSA
 Title: Functions for Bayesian Sensitivity Analysis in Mediation
-Version: 0.0.1.0000
+Version: 1.0
 Authors@R: "Leah Comment <leah.comment@gmail.com> [aut, cre]"
 Description: Functions relating to the Bayesian Sensitivity Analysis for mediation
 Depends: R (>= 3.2.4)
