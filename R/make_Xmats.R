@@ -34,7 +34,6 @@ make_Xmat_set <- function(formula, data, varname, val){
         data[[varname]] <- as.factor(val)
         return(make_Xmat(formula, data, xlev = xlev))
     } else {
-        print("saywhat")
         data[[varname]] <- val
         return(make_Xmat(formula, data))
     }
