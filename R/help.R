@@ -5,4 +5,5 @@
 #' @import RcppArmadillo
 #' @importFrom Rcpp evalCpp
 #' @useDynLib medBSA
+#' @exportPattern "^[[:alpha:]]+"
 NULL

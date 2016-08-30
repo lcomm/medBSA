@@ -252,9 +252,11 @@ arma::vec ll_U_Cpp(arma::vec U, arma::mat XmatU, arma::vec coef_U){
 
 
 //' Calculate M part of likelihood (take 2)
+//'
 //' @param M Vector containing M
 //' @param XmatM Design matrix for M outcome model
 //' @param coef_M Coefficient matrix for M regression
+//'
 //' @export
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export(ll_M)]]
@@ -269,9 +271,11 @@ arma::vec ll_M_Cpp(arma::vec& M,
 
 
 //' Calculate Y part of likelihood (take 2)
+//'
 //' @param Y Vector containing Y
 //' @param XmatY Design matrix for Y outcome model
 //' @param coef_Y Coefficient vector for Y regression
+//'
 //' @export
 // [[Rcpp::depends(RcppArmadillo)]]
 // [[Rcpp::export(ll_Y)]]
