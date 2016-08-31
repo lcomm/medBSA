@@ -1,61 +1,123 @@
-#' Propose new values for a coefficient vector or matrix from an MVN
+#' Independence sampler updating with fixed distribution
+#' Proposes from a MVN with mean prop_mean and
+#' variance-covariance matrix prop_Sigma
 #'
-#' @param coef Current value of coefficient vector or matrix
-#' @param prop_mean Mean of MVM proposal distribution. Defaults to current
-#' value of coefficient vector (i.e., random vector)
-#' @param prop_Sigma Variance-covariance matrix of MVM proposal distribution
+#' Supports split block updating
 #'
-#' @return Vector or matrix of same shape as coef
+#' @param coef Coefficient vector or matrix
+#' @param outcome Character containing outcome variable name in data
+#' @param data Data frame
+#' @param Xmat Design matrix for regression
+#' @param ll_func Function to calculate log-likelihood for model
+#' @param dprior Function to evaluate prior density for coefficients
+#' @param prop_mean Mean of proposal distribution
+#' @param prop_Sigma Variance-covariance matrix for proposal distribution
+#' @param block Vector or matrix of same dimension of coef, denoting with which
+#' block the parameter should be updated. Defaults to update all parameters at
+#' once (all block = 1).
+#'
+#' @return List containing updated coefficient (coef) and vector or matrix of
+#' whether updates were accepted
 #' @export
-propose_coef <- function(coef, prop_mean = c(coef), prop_Sigma){
+indep <- function(coef, outcome,
+                  data, Xmat,
+                  ll_func, dprior,
+                  prop_mean, prop_Sigma,
+                  block = coef*0 + 1){
 
-    #Copy structure of existing coefficient container
-    coef_star <- coef
+    #Keep track of acceptances for each parameter
+    acc <- coef*0
 
-    #Propose from MVN with correct mean and variance
-    coef_star[] <- c(rmvn(1, prop_mean, prop_Sigma))
+    #Loop over the blocks
+    for (i in 1:max(block)){
+        set <- which(block == i)
 
-    #Return
-    return(coef_star)
+        #Restrict proposal mean and variance
+        res_mean <- prop_mean[set]
+        res_Sigma <- prop_Sigma[set, set]
+
+        #Propose
+        star <- coef
+        star[set] <- rmvn(1, res_mean, res_Sigma)
+
+        #Calculate log acceptance ratio
+        diff_ll <- sum(ll_func(data[[outcome]], Xmat, star)) -
+                   sum(ll_func(data[[outcome]], Xmat, coef))
+
+        diff_prior <- dprior(star) - dprior(coef)
+
+        diff_prop <- dmvn(star[set], res_mean, res_Sigma) -
+                     dmvn(coef[set], res_mean, res_Sigma)
+
+        log_AR <- diff_ll + diff_prior - diff_prop
+
+        #Accept with correct probability
+        if (log(runif(1)) < log_AR){
+            coef <- star
+            acc[set] <- 1
+        }
+    }
+
+    #Return after all blocks update
+    return(list(coef=coef, acc=acc))
+
 }
 
-#' Calculate log-acceptance ratio for coefficient vectors or matrices
+
+
+#' Random walk Metropolis updating
+#' Proposes from a MVN with mean centered at current value and
+#' variance-covariance matrix prop_Sigma
 #'
+#' Supports split block updating
+#'
+#' @param coef Coefficient vector or matrix
+#' @param outcome Character containing outcome variable name in data
 #' @param data Data frame
-#' @param outcome Character containing outcome model variable name (e.g., "Y")
-#' @param Xmat Design matrix corresponding to coefficient vector or matrix
-#' @param coef Current value of coefficient vector or matrix
-#' @param coef_star Proposed value of coefficient vector or matrix
-#' @param prior_mean Prior distribution mean vector
-#' @param prior_Sigma Prior distribution variance-covariance matrix
-#' @param prop_Sigma Proposal distribution variance-covariance matrix
+#' @param Xmat Design matrix for regression
+#' @param ll_func Function to calculate log-likelihood for model
+#' @param dprior Function to evaluate prior density for coefficients
+#' @param prop_Sigma Variance-covariance matrix for proposal distribution
+#' @param block Vector or matrix of same dimension of coef, denoting with which
+#' block the parameter should be updated. Defaults to update all parameters at
+#' once (all block = 1).
 #'
-#' @return Scalar log-acceptance ratio
+#' @return List containing updated coefficient (coef) and vector or matrix of
+#' whether updates were accepted
 #' @export
-calc_logAR <- function(data, outcome, Xmat,
-                       coef, coef_star,
-                       prior_mean = rep(0, length(coef)),
-                       prior_Sigma = diag(length(coef))*100,
-                       prop_Sigma = diag(length(coef))){
+metrop <- function(coef, outcome,
+                  data, Xmat,
+                  ll_func, dprior,
+                  prop_Sigma,
+                  block = coef*0 + 1){
 
-    #Difference in log-likelihoods (depends on outcome model form)
-    diff_ll <- switch(outcome,
-                      "Y" = sum(medBSA:::ll_Y(data$Y, Xmat, coef_star)) -
-                          sum(medBSA:::ll_Y(data$Y, Xmat, coef)),
-                      "U" = sum(medBSA:::ll_U(data$U, Xmat, coef_star)) -
-                          sum(medBSA:::ll_U(data$U, Xmat, coef)),
-                      "M" = sum(medBSA:::ll_M(data$M, Xmat, coef_star)) -
-                          sum(medBSA:::ll_M(data$M, Xmat, coef)))
+    #Keep track of acceptances for each parameter
+    acc <- coef*0
 
-    #Difference in log-prior densities
-    diff_prior <- dmvn(c(coef_star), prior_mean, prior_Sigma, log = TRUE) -
-        dmvn(c(coef), prior_mean, prior_Sigma, log = TRUE)
+    #Loop over the blocks
+    for (i in 1:max(block)){
+        set <- which(block == i)
 
-    #Difference in proposal densities (not relevant for random walk...)
-    diff_prop <- dmvn(c(coef_star), c(coef), prop_Sigma, log = TRUE) -
-        dmvn(c(coef), c(coef_star), prop_Sigma, log = TRUE)
+        #Propose
+        star <- coef
+        star[set] <- rmvn(1, coef[set], prop_Sigma[set, set])
 
-    #Put together to return log-acceptance ratio
-    return(diff_ll + diff_prior - diff_prop)
+        #Calculate log acceptance ratio
+        diff_ll <- sum(ll_func(data[[outcome]], Xmat, star)) -
+                   sum(ll_func(data[[outcome]], Xmat, coef))
+
+        diff_prior <- dprior(star) - dprior(coef)
+
+        log_AR <- diff_ll + diff_prior
+
+        #Accept with correct probability
+        if (log(runif(1)) < log_AR){
+            coef <- star
+            acc[set] <- 1
+        }
+    }
+
+    #Return after all blocks update
+    return(list(coef=coef, acc=acc))
 
 }
