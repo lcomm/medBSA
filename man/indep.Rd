@@ -6,8 +6,7 @@
 Proposes from a MVN with mean prop_mean and
 variance-covariance matrix prop_Sigma}
 \usage{
-indep(coef, outcome, data, Xmat, ll_func, dprior, prop_mean, prop_Sigma,
-  block = coef * 0 + 1)
+indep(coef, outcome, data, Xmat, ll_func, dprior, prop_mean, prop_Sigma, block)
 }
 \arguments{
 \item{coef}{Coefficient vector or matrix}
@@ -27,8 +26,7 @@ indep(coef, outcome, data, Xmat, ll_func, dprior, prop_mean, prop_Sigma,
 \item{prop_Sigma}{Variance-covariance matrix for proposal distribution}
 
 \item{block}{Vector or matrix of same dimension of coef, denoting with which
-block the parameter should be updated. Defaults to update all parameters at
-once (all block = 1).}
+block the parameter should be updated}
 }
 \value{
 List containing updated coefficient (coef) and vector or matrix of

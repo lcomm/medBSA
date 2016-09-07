@@ -13,8 +13,7 @@
 #' @param prop_mean Mean of proposal distribution
 #' @param prop_Sigma Variance-covariance matrix for proposal distribution
 #' @param block Vector or matrix of same dimension of coef, denoting with which
-#' block the parameter should be updated. Defaults to update all parameters at
-#' once (all block = 1).
+#' block the parameter should be updated
 #'
 #' @return List containing updated coefficient (coef) and vector or matrix of
 #' whether updates were accepted
@@ -23,7 +22,7 @@ indep <- function(coef, outcome,
                   data, Xmat,
                   ll_func, dprior,
                   prop_mean, prop_Sigma,
-                  block = coef*0 + 1){
+                  block){
 
     #Keep track of acceptances for each parameter
     acc <- coef*0
@@ -79,8 +78,7 @@ indep <- function(coef, outcome,
 #' @param dprior Function to evaluate prior density for coefficients
 #' @param prop_Sigma Variance-covariance matrix for proposal distribution
 #' @param block Vector or matrix of same dimension of coef, denoting with which
-#' block the parameter should be updated. Defaults to update all parameters at
-#' once (all block = 1).
+#' block the parameter should be updated
 #'
 #' @return List containing updated coefficient (coef) and vector or matrix of
 #' whether updates were accepted
@@ -88,8 +86,8 @@ indep <- function(coef, outcome,
 metrop <- function(coef, outcome,
                   data, Xmat,
                   ll_func, dprior,
-                  prop_Sigma,
-                  block = coef*0 + 1){
+                  prop_mean, prop_Sigma,
+                  block){
 
     #Keep track of acceptances for each parameter
     acc <- coef*0
