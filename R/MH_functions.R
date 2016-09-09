@@ -40,8 +40,8 @@ indep <- function(coef, outcome,
         star[set] <- rmvn(1, res_mean, res_Sigma)
 
         #Calculate log acceptance ratio
-        diff_ll <- sum(ll_func(data[[outcome]], Xmat, star)) -
-                   sum(ll_func(data[[outcome]], Xmat, coef))
+        diff_ll <- sum(pmax(-10000, ll_func(data[[outcome]], Xmat, star))) -
+                   sum(pmax(-10000, ll_func(data[[outcome]], Xmat, coef)))
 
         diff_prior <- dprior(star) - dprior(coef)
 
@@ -101,8 +101,8 @@ metrop <- function(coef, outcome,
         star[set] <- rmvn(1, coef[set], prop_Sigma[set, set])
 
         #Calculate log acceptance ratio
-        diff_ll <- sum(ll_func(data[[outcome]], Xmat, star)) -
-                   sum(ll_func(data[[outcome]], Xmat, coef))
+        diff_ll <- sum(pmax(-10000, ll_func(data[[outcome]], Xmat, star))) -
+                   sum(pmax(-10000, ll_func(data[[outcome]], Xmat, coef)))
 
         diff_prior <- dprior(star) - dprior(coef)
 

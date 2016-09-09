@@ -13,17 +13,10 @@ runBSA <- function(data,
   Uformula <- formulas$U
   
   # Update from existing state (or initial values) if provided
-  if (!is.null(state)){
-    coef_Y <- state$coef_Y
-    coef_M <- state$coef_M
-    coef_U <- state$coef_U
-    set.seed(state$seed)
-  } else {
-    coef_Y <- priors[["Y"]][["mean"]]
-    coef_M <- matrix(priors[["M"]][["mean"]], 
-                     ncol = length(unique(data$M)) - 1)
-    coef_U <- priors[["U"]][["mean"]]
-  }
+  coef_Y <- priors[["Y"]][["mean"]]
+  coef_M <- matrix(priors[["M"]][["mean"]], 
+                   ncol = length(unique(data$M)) - 1)
+  coef_U <- priors[["U"]][["mean"]]
 
   # Initialize result container
   result        <- list()
