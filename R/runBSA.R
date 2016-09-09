@@ -119,9 +119,9 @@ runBSA <- function(data,
     result$coef_U[, iter]   <- coef_U
     
     # Save acceptance results of this iteration
-    result$acc[["Y"]][, iter]  <- resY$acc
-    result$acc[["M"]][,, iter] <- resM$acc
-    result$acc[["U"]][, iter]  <- resU$acc
+    result$acc[["Y"]][, iter]   <- resY$acc
+    result$acc[["M"]][, , iter] <- resM$acc
+    result$acc[["U"]][, iter]   <- resU$acc
     
     # Tune proposal distribution
     props <- tuneProposal(props, result$acc, blocks, iter, 

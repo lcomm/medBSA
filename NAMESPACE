@@ -3,6 +3,8 @@
 export(column_picker)
 export(dbern)
 export(indep)
+export(inflateVariance)
+export(makePriors)
 export(make_Xmat)
 export(make_Xmat_set)
 export(make_dummy)

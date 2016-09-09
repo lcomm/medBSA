@@ -49,8 +49,10 @@ tuneProposal <- function(props, acc, blocks,
       
       # Assign multiplier to inflate or deflate accordingly
       mult <- 1
-      if (blockSize > 5) {
-        if (accProp > 0.6) {
+      if (blockSize < 5) {
+        if (accProp > 0.7) {
+          mult <- 1.2
+        } else if (accProp > 0.5) {
           mult <- 1.1
         } else if (accProp < 0.05) {
           mult <- 0.7
@@ -58,7 +60,9 @@ tuneProposal <- function(props, acc, blocks,
           mult <- 0.9
         }
       } else {
-        if (accProp > 0.5) {
+        if (accProp > 0.6) {
+          mult <- 1.2
+        } else if (accProp > 0.3) {
           mult <- 1.1
         } else if (accProp < 0.10) {
           mult <- 0.7
