@@ -4,8 +4,7 @@
 \alias{runBSA}
 \title{Function to run the sensitivity analysis}
 \usage{
-runBSA(data, formulas, priors, props, state = NULL, blocks = NULL,
-  niter = 100)
+runBSA(data, formulas, priors, props, blocks = NULL, niter = 100)
 }
 \description{
 Function to run the sensitivity analysis

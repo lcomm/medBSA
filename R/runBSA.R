@@ -3,7 +3,6 @@ runBSA <- function(data,
                    formulas,
                    priors,
                    props,
-                   state = NULL,
                    blocks = NULL,
                    niter = 100){
 
