@@ -19,46 +19,50 @@
 #' whether updates were accepted
 #' @export
 indep <- function(coef, outcome,
-                  data, Xmat,
-                  ll_func, dprior,
-                  prop_mean, prop_Sigma,
-                  block){
+          data, Xmat,
+          ll_func, dprior,
+          prop_mean, prop_Sigma,
+          block){
 
-    #Keep track of acceptances for each parameter
-    acc <- coef*0
+  #Keep track of acceptances for each parameter
+  acc <- coef*0
 
-    #Loop over the blocks
-    for (i in 1:max(block)){
-        set <- which(block == i)
+  #Loop over the blocks
+  for (i in 1:max(block)){
+    set <- which(block == i)
 
-        #Restrict proposal mean and variance
-        res_mean <- prop_mean[set]
-        res_Sigma <- prop_Sigma[set, set]
+    #Restrict proposal mean and variance
+    res_mean <- prop_mean[set]
+    res_Sigma <- prop_Sigma[set, set]
 
-        #Propose
-        star <- coef
-        star[set] <- rmvn(1, res_mean, res_Sigma)
+    #Propose
+    star <- coef
+    star[set] <- rmvn(1, res_mean, res_Sigma)
 
-        #Calculate log acceptance ratio
-        diff_ll <- sum(pmax(-10000, ll_func(data[[outcome]], Xmat, star))) -
-                   sum(pmax(-10000, ll_func(data[[outcome]], Xmat, coef)))
+    #Calculate log acceptance ratio
+    diff_ll <- sum(pmax(-10000, ll_func(data[[outcome]], Xmat, star))) -
+           sum(pmax(-10000, ll_func(data[[outcome]], Xmat, coef)))
 
-        diff_prior <- dprior(star) - dprior(coef)
+    diff_prior <- dprior(star) - dprior(coef)
 
-        diff_prop <- dmvn(star[set], res_mean, res_Sigma) -
-                     dmvn(coef[set], res_mean, res_Sigma)
+    diff_prop <- dmvn(star[set], res_mean, res_Sigma) -
+           dmvn(coef[set], res_mean, res_Sigma)
 
-        log_AR <- diff_ll + diff_prior - diff_prop
-
-        #Accept with correct probability
-        if (log(runif(1)) < log_AR){
-            coef <- star
-            acc[set] <- 1
-        }
+    log_AR <- diff_ll + diff_prior - diff_prop
+    
+    #Accept with correct probability
+    #Assume any NaN's arose from ll calc for star; don't accept
+    if (!anyNA(diff_ll) && !any(is.infinite(diff_ll))){
+      if (log(runif(1)) < log_AR){
+      coef <- star
+      acc[set] <- 1
+      }  
     }
 
-    #Return after all blocks update
-    return(list(coef=coef, acc=acc))
+  }
+
+  #Return after all blocks update
+  return(list(coef=coef, acc=acc))
 
 }
 
@@ -84,38 +88,42 @@ indep <- function(coef, outcome,
 #' whether updates were accepted
 #' @export
 metrop <- function(coef, outcome,
-                  data, Xmat,
-                  ll_func, dprior,
-                  prop_mean, prop_Sigma,
-                  block){
+          data, Xmat,
+          ll_func, dprior,
+          prop_mean, prop_Sigma,
+          block){
 
-    #Keep track of acceptances for each parameter
-    acc <- coef*0
+  #Keep track of acceptances for each parameter
+  acc <- coef*0
 
-    #Loop over the blocks
-    for (i in 1:max(block)){
-        set <- which(block == i)
+  #Loop over the blocks
+  for (i in 1:max(block)){
+    set <- which(block == i)
 
-        #Propose
-        star <- coef
-        star[set] <- rmvn(1, coef[set], prop_Sigma[set, set])
+    #Propose
+    star <- coef
+    star[set] <- rmvn(1, coef[set], prop_Sigma[set, set])
 
-        #Calculate log acceptance ratio
-        diff_ll <- sum(pmax(-10000, ll_func(data[[outcome]], Xmat, star))) -
-                   sum(pmax(-10000, ll_func(data[[outcome]], Xmat, coef)))
+    #Calculate log acceptance ratio
+    diff_ll <- sum(pmax(-10000, ll_func(data[[outcome]], Xmat, star))) -
+           sum(pmax(-10000, ll_func(data[[outcome]], Xmat, coef)))
 
-        diff_prior <- dprior(star) - dprior(coef)
+    diff_prior <- dprior(star) - dprior(coef)
 
-        log_AR <- diff_ll + diff_prior
+    log_AR <- diff_ll + diff_prior
 
-        #Accept with correct probability
-        if (log(runif(1)) < log_AR){
-            coef <- star
-            acc[set] <- 1
-        }
+    #Accept with correct probability
+    #Assume any NaN's arose from ll calc for star; don't accept
+    if (!anyNA(diff_ll) && !any(is.infinite(diff_ll))){
+      if (log(runif(1)) < log_AR){
+        coef <- star
+        acc[set] <- 1
+      }  
     }
+    
+  }
 
-    #Return after all blocks update
-    return(list(coef=coef, acc=acc))
+  #Return after all blocks update
+  return(list(coef=coef, acc=acc))
 
 }

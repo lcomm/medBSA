@@ -117,7 +117,7 @@ runBSA <- function(data,
     
     # Tune proposal distribution
     props <- tuneProposal(props, result$acc, blocks, iter, 
-                          lookback = 100, tuneEvery = 200, stopAt = 5000)
+                          props$lookback, props$tuneEvery, props$stopAt)
     
   } # End of chain
   
@@ -127,7 +127,6 @@ runBSA <- function(data,
                        coef_M = coef_M, 
                        coef_U = coef_U, 
                        seed=.Random.seed)
-  class(result) <- "medBSA"
   return(result)
   
 }
