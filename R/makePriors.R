@@ -13,9 +13,9 @@ makePriors <- function(data, formulas){
   require("VGAM", quietly = TRUE)
   
   # Fit regression models to small data set
-  fitY <- glm(formulas$Y, family = binomial(link="logit"), data)
-  fitM <- vglm(formulas$M, family = multinomial(refLevel=1), data)
-  fitU <- glm(formulas$U, family = binomial(link="logit"), data)
+  fitY <- glm(formulas$Y, family = binomial(link = "logit"), data)
+  fitM <- vglm(formulas$M, family = multinomial(refLevel = 1), data)
+  fitU <- glm(formulas$U, family = binomial(link = "logit"), data)
   
   # Prepare to reorder coefficient matrix for M
   newOrderM <- c(matrix(1:length(coef(fitM)), 
