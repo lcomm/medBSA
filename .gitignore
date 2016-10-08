@@ -1,5 +1,6 @@
 .Rproj.user
 .Rhistory
 .RData
-.o
-.dll
+src/*.o
+scr/*.so
+scr/*.dll
